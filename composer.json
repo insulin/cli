@@ -1,0 +1,36 @@
+{
+    "name": "insulin/cli",
+    "description": "Because too much sugar causes diabetes",
+    "license": [
+        "LGPL-2.1",
+        "GPL-3.0+"
+    ],
+    "authors": [
+        {
+            "name": "Filipe Guerra",
+            "email": "alias.mac@gmail.com",
+            "homepage": "http://blog.open-war.com",
+            "role": "Developer"
+        },
+        {
+            "name": "João Morais",
+            "email": "jcsmorais@gmail.com",
+            "homepage": "http://blog.joaomorais.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/config": "2.1.*",
+        "symfony/console": "2.1.*",
+        "symfony/dependency-injection": "2.1.*",
+        "symfony/finder": "2.1.*",
+        "symfony/locale": "2.1.*"
+    },
+    "minimum-stability": "dev"
+}

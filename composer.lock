@@ -1,0 +1,259 @@
+{
+    "hash": "cae1acf797ab571deacd2160124142ed",
+    "packages": [
+        {
+            "name": "symfony/config",
+            "version": "2.1.x-dev",
+            "target-dir": "Symfony/Component/Config",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Config",
+                "reference": "4a15aba224b81a15347311ae7ebe3e87de39a6b7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/symfony/Config/zipball/4a15aba224b81a15347311ae7ebe3e87de39a6b7",
+                "reference": "4a15aba224b81a15347311ae7ebe3e87de39a6b7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "1350717030",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Config": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Config Component",
+            "homepage": "http://symfony.com"
+        },
+        {
+            "name": "symfony/console",
+            "version": "2.1.x-dev",
+            "target-dir": "Symfony/Component/Console",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Console",
+                "reference": "55030275de3c40849b6afac9f913ccd92ffe3232"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/symfony/Console/zipball/55030275de3c40849b6afac9f913ccd92ffe3232",
+                "reference": "55030275de3c40849b6afac9f913ccd92ffe3232",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "1350916632",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Console": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Console Component",
+            "homepage": "http://symfony.com"
+        },
+        {
+            "name": "symfony/dependency-injection",
+            "version": "2.1.x-dev",
+            "target-dir": "Symfony/Component/DependencyInjection",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/DependencyInjection",
+                "reference": "987bd44173aad326632a38fff6e9bfc69e61d200"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/symfony/DependencyInjection/zipball/987bd44173aad326632a38fff6e9bfc69e61d200",
+                "reference": "987bd44173aad326632a38fff6e9bfc69e61d200",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/yaml": "2.1.*",
+                "symfony/config": "2.1.*"
+            },
+            "suggest": {
+                "symfony/yaml": "2.1.*",
+                "symfony/config": "2.1.*"
+            },
+            "time": "1350916632",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\DependencyInjection": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony DependencyInjection Component",
+            "homepage": "http://symfony.com"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "2.1.x-dev",
+            "target-dir": "Symfony/Component/Finder",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Finder",
+                "reference": "e5dac3c0c277c1b5266dcb467c49b29dc7fb6a9b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/symfony/Finder/zipball/e5dac3c0c277c1b5266dcb467c49b29dc7fb6a9b",
+                "reference": "e5dac3c0c277c1b5266dcb467c49b29dc7fb6a9b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "1350717030",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Finder": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Finder Component",
+            "homepage": "http://symfony.com"
+        },
+        {
+            "name": "symfony/locale",
+            "version": "2.1.x-dev",
+            "target-dir": "Symfony/Component/Locale",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Locale",
+                "reference": "c6fe3080e6017a1f89f6b65075695f25adf85bd0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/symfony/Locale/zipball/c6fe3080e6017a1f89f6b65075695f25adf85bd0",
+                "reference": "c6fe3080e6017a1f89f6b65075695f25adf85bd0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-intl": ">=5.3.3"
+            },
+            "time": "1350717030",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Locale": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Locale Component",
+            "homepage": "http://symfony.com"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "dev",
+    "stability-flags": [
+
+    ]
+}
