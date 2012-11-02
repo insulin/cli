@@ -30,7 +30,8 @@
         "symfony/console": "2.1.*",
         "symfony/dependency-injection": "2.1.*",
         "symfony/finder": "2.1.*",
-        "symfony/locale": "2.1.*"
+        "symfony/locale": "2.1.*",
+        "symfony/process": "2.1.*"
     },
     "minimum-stability": "dev"
 }
