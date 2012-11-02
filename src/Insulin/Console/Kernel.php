@@ -150,7 +150,7 @@ class Kernel implements KernelInterface
     public function boot()
     {
         if (true === $this->booted) {
-            return;
+            return $this->bootLevel;
         }
 
         //$name = $this->getCommandName($input);
@@ -165,7 +165,7 @@ class Kernel implements KernelInterface
         */
 
         // try to bootstrap to max level and see what commands can we offer
-        $runLevel = 0;
+        $bootLevel = 0;
         try {
             $levels = $this->getBootstrapLevels();
             foreach ($levels as $level) {
@@ -180,7 +180,7 @@ class Kernel implements KernelInterface
                 if ($this->isDebug()) {
                     //$output->writeln(sprintf('<info>[done]</info>.'));
                 }
-                $runLevel = $level;
+                $bootLevel = $level;
             }
             // FIXME this should catch other type of exception...
         } catch (\Exception $e) {
@@ -204,8 +204,9 @@ class Kernel implements KernelInterface
         //$this->initializeContainer();
 
         $this->booted = true;
+        $this->bootLevel = $bootLevel;
 
-        return $runLevel;
+        return $this->bootLevel;
     }
 
     public function getBootstrapLevels()
