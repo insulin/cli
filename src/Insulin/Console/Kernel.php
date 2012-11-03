@@ -861,4 +861,44 @@ class Kernel implements KernelInterface
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
         // TODO load other configuration files like in ~/.insulin
     }
+
+    /**
+     * Gets Sugar full version information.
+     *
+     * @param string $prop
+     *   The property to retrieve. Can be one of 'version', 'build' or 'flavor'.
+     */
+    public function getSugarInfo($prop = 'version')
+    {
+        static $sugarInfo = array(
+            'flavor' => false,
+            'version' => false,
+            'build' => false,
+        );
+
+        if (!array_key_exists($prop, $sugarInfo)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Unknown Sugar version property "%s".',
+                $prop
+            ));
+        }
+
+        if (false === $sugarInfo[$prop]) {
+            include $this->getSugarRoot() . '/sugar_version.php';
+            foreach ($sugarInfo as $k => $v) {
+                $field = 'sugar_' . $k;
+                $sugarInfo[$k] = $$field;
+            }
+        }
+
+        if (false === $sugarInfo[$prop]) {
+            throw new \RuntimeException(sprintf(
+                'Unknown get Sugar version property "%s" from current Sugar instance "%s".',
+                $prop,
+                $this->getSugarRoot()
+            ));
+        }
+
+        return $sugarInfo[$prop];
+    }
 }

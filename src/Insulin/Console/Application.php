@@ -96,6 +96,17 @@ class Application extends BaseApplication
     }
 
     /**
+     * Gets the Kernel associated with this Console.
+     *
+     * @return KernelInterface
+     *   A KernelInterface instance.
+     */
+    public function getKernel()
+    {
+        return $this->kernel;
+    }
+
+    /**
      * Registers Commands based on the boot level reached on the Kernel.
      *
      * Insulin commands follow the conventions:
@@ -148,44 +159,5 @@ class Application extends BaseApplication
                 $this->add($r->newInstance());
             }
         }
-    }
-
-    /**
-     * Gets Sugar full version information.
-     *
-     * @param string $prop the property to retrieve. Can be one of 'version', 'build', 'flavor'.
-     */
-    public function getSugarInfo($prop = 'version')
-    {
-        static $sugarInfo = array(
-            'flavor' => false,
-            'version' => false,
-            'build' => false,
-        );
-
-        if (!array_key_exists($prop, $sugarInfo)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Unknown Sugar version property "%s".',
-                $prop
-            ));
-        }
-
-        if (false === $sugarInfo[$prop]) {
-            include $this->kernel->getSugarRoot() . '/sugar_version.php';
-            foreach ($sugarInfo as $k => $v) {
-                $field = 'sugar_' . $k;
-                $sugarInfo[$k] = $$field;
-            }
-        }
-
-        if (false === $sugarInfo[$prop]) {
-            throw new \RuntimeException(sprintf(
-                'Unknown get Sugar version property "%s" from current Sugar instance "%s".',
-                $prop,
-                $this->kernel->getSugarRoot()
-            ));
-        }
-
-        return $sugarInfo[$prop];
     }
 }

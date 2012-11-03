@@ -101,7 +101,10 @@ $sugar_timestamp    = \'2008-08-01 12:00am\';
      */
     private function getKernel($level)
     {
-        $kernel = $this->getMock("Insulin\Console\Kernel");
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('boot', 'getRootDir', 'getSugarRoot')
+        );
         $kernel->expects($this->any())->method('boot')->will(
             $this->returnValue($level)
         );
