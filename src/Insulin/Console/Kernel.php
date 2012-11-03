@@ -32,6 +32,7 @@ class Kernel implements KernelInterface
     protected $bootLevel;
     protected $startTime;
     protected $classes;
+    protected $sugarRoot;
 
     const NAME = 'Insulin';
     const VERSION = '2.0';
@@ -237,8 +238,11 @@ class Kernel implements KernelInterface
                 break;
 
             case self::BOOT_SUGAR_ROOT :
-
                 $this->getSugarRoot();
+
+                if (!defined('sugarEntry')) {
+                    define('sugarEntry', true);
+                }
                 break;
 
             // TODO give support to other run levels
@@ -695,21 +699,40 @@ class Kernel implements KernelInterface
 
     public function getSugarRoot()
     {
-        // FIXME make me a cache since this function will be massively used.
-
-        if (!defined('sugarEntry')) {
-            define('sugarEntry', true);
+        if ($this->sugarRoot) {
+            return $this->sugarRoot;
         }
 
-        /*
-        if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+        try {
+            $this->sugarRoot = $this->locateRoot();
+
+        } catch (\Exception $e) {
+            // FIXME: replace exception below with
+            // re throw Insulin\Console\Exception\SugarRootNotFound if no
+            // sugar version found on the path given
+            throw $e;
         }
-        */
 
-        // FIXME fill sugarRoot based on options given. Using local path for now.
-        return $this->locateRoot();
+        return $this->sugarRoot;
+    }
 
-        // throw exception if not a sugar version found on the path given
+    public function setSugarRoot($path)
+    {
+        if (empty($path)) {
+            $this->sugarRoot = null;
+            return;
+        }
+
+        if (!$this->isSugarRoot($path)) {
+            // FIXME: replace exception below with
+            // throw Insulin\Console\Exception\InvalidSugarRoot
+            throw new \RunTimeException(sprintf(
+                'Supplied sugar root "%s" isn\'t valid',
+                $path
+            ));
+        }
+
+        $this->sugarRoot = $path;
     }
 
     /**
