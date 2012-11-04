@@ -866,7 +866,7 @@ class Kernel implements KernelInterface
      * Gets Sugar full version information.
      *
      * @param string $prop
-     *   The property to retrieve. Can be one of 'version', 'build' or 'flavor'.
+     *   The property to retrieve, can be 'version', 'build' or 'flavor'.
      */
     public function getSugarInfo($prop = 'version')
     {
@@ -893,7 +893,7 @@ class Kernel implements KernelInterface
 
         if (false === $sugarInfo[$prop]) {
             throw new \RuntimeException(sprintf(
-                'Unknown get Sugar version property "%s" from current Sugar instance "%s".',
+                'Unsupported version property "%s" in current SugarCRM instance "%s"',
                 $prop,
                 $this->getSugarRoot()
             ));
