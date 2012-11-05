@@ -55,6 +55,9 @@ class Application extends BaseApplication
         $definition->addOption(
             new InputOption('--process-isolation', null, InputOption::VALUE_NONE, 'Launch commands from shell as a separate processes.')
         );
+        $definition->addOption(
+            new InputOption('--root', '-r', InputOption::VALUE_REQUIRED, 'SugarCRM root directory, defaults to current directory.')
+        );
 
         return $definition;
     }
@@ -69,6 +72,8 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
+        $this->kernel->setSugarRoot($input->getParameterOption(array('--root', '-r')));
+
         $this->registerCommands();
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
