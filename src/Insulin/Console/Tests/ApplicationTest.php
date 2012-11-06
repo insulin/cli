@@ -54,7 +54,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      */
     private function getKernel($level)
     {
-        $kernel = $this->getMock("Insulin\Console\KernelInterface");
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('boot', 'getRootDir')
+        );
         $kernel->expects($this->any())->method('boot')->will(
             $this->returnValue($level)
         );
