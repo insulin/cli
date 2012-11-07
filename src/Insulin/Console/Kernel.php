@@ -42,49 +42,49 @@ class Kernel implements KernelInterface
     const EXTRA_VERSION = '';
 
     /**
-     * Only bootstrap Insulin, without any Sugar specific code.
+     * Only bootstrap Insulin, without any SugarCRM specific code.
      *
      * Any code that operates on the Insulin installation, and not specifically
-     * any Sugar directory, should bootstrap to this phase.
+     * any SugarCRM directory, should bootstrap to this phase.
      */
     const BOOT_INSULIN = 1;
 
     /**
-     * Set up and test for a valid sugar root, either through the -r/--root options,
+     * Set up and test for a valid SugarCRM root, either through the -r/--root options,
      * or evaluated based on the current working directory.
      *
-     * Any code that interacts with an entire Sugar installation, and not a specific
-     * site on the Sugar installation should use this bootstrap phase.
+     * Any code that interacts with an entire SugarCRM installation, and not a specific
+     * site on the SugarCRM installation should use this bootstrap phase.
      */
     const BOOT_SUGAR_ROOT = 2;
 
     /**
-     * Load the settings from the Sugar sites directory.
+     * Load the settings from the SugarCRM sites directory.
      *
-     * This phase is commonly used for code that interacts with the Sugar install API,
+     * This phase is commonly used for code that interacts with the SugarCRM install API,
      * as both install.php and update.php start at this phase.
      */
     const BOOT_SUGAR_CONFIGURATION = 3;
 
     /**
-     * Connect to the Sugar database using the database credentials loaded
+     * Connect to the SugarCRM database using the database credentials loaded
      * during the previous bootstrap phase.
      *
-     * Any code that needs to interact with the Sugar database API needs to
+     * Any code that needs to interact with the SugarCRM database API needs to
      * be bootstrapped to at least this phase.
      */
     const BOOT_SUGAR_DATABASE = 4;
 
     /**
-     * Fully initialize Sugar.
+     * Fully initialize SugarCRM.
      *
-     * Any code that interacts with the general Sugar API should be
+     * Any code that interacts with the general SugarCRM API should be
      * bootstrapped to this phase.
      */
     const BOOT_SUGAR_FULL = 5;
 
     /**
-     * Log in to the initialized Sugar site.
+     * Log in to the initialized SugarCRM site.
      *
      * This is the default bootstrap phase all commands will try to reach,
      * unless otherwise specified.
@@ -92,7 +92,7 @@ class Kernel implements KernelInterface
      * This bootstrap phase is used after the site has been
      * fully bootstrapped.
      *
-     * This phase will log you in to the sugar site with the username
+     * This phase will log you in to the SugarCRM site with the username
      * or user ID specified by the --user/ -u option.
      *
      * Use this bootstrap phase for your command if you need to have access
@@ -704,12 +704,12 @@ class Kernel implements KernelInterface
         }
 
         try {
-            $this->sugarRoot = $this->locateRoot();
+            $this->sugarRoot = $this->locateSugarRoot();
 
         } catch (\Exception $e) {
             // FIXME: replace exception below with
             // re throw Insulin\Console\Exception\SugarRootNotFound if no
-            // sugar version found on the path given
+            // SugarCRM version found on the path given
             throw $e;
         }
 
@@ -727,7 +727,7 @@ class Kernel implements KernelInterface
             // FIXME: replace exception below with
             // throw Insulin\Console\Exception\InvalidSugarRoot
             throw new \RunTimeException(sprintf(
-                'Supplied sugar root "%s" isn\'t valid',
+                'Supplied SugarCRM root "%s" isn\'t valid',
                 $path
             ));
         }
@@ -736,17 +736,17 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Exhaustive depth-first search to try and locate the Sugar root directory.
-     * This makes it possible to run insulin from a subdirectory of the sugar
-     * root.
+     * Exhaustive depth-first search to try and locate the SugarCRM root
+     * directory. This makes it possible to run insulin from a subdirectory of
+     * the SugarCRM root.
      *
      * @param $startPath
      *   Search start path. Defaults to current working directory.
      *
      * @return
-     *   A path to sugar root, or FALSE if not found.
+     *   Path to SugarCRM root directory.
      */
-    public function locateRoot($startPath = null)
+    public function locateSugarRoot($startPath = null)
     {
         $sugarRoot = false;
 
@@ -777,7 +777,7 @@ class Kernel implements KernelInterface
         }
 
         if (!$sugarRoot) {
-            throw new \RuntimeException('Unable to find a sugar root.');
+            throw new \RuntimeException('Unable to find a SugarCRM root.');
         }
 
         return $sugarRoot;
@@ -805,13 +805,13 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Checks whether given path qualifies as a Sugar root.
+     * Checks whether given path qualifies as a SugarCRM root.
      *
      * @param string
      *   Path to check.
      *
      * @return boolean
-     *   TRUE if a Sugar root, FALSE otherwise.
+     *   TRUE if a SugarCRM root, FALSE otherwise.
      */
     public function isSugarRoot($path)
     {
@@ -850,8 +850,8 @@ class Kernel implements KernelInterface
         //    return $path;
         //}
         // We use PWD if available because getcwd() resolves symlinks, which
-        // could take us outside of the Sugar root, making it impossible to find.
-        // $_SERVER['PWD'] isn't set on windows and generates a Notice.
+        // could take us outside of the SugarCRM root, making it impossible to
+        // find.$_SERVER['PWD'] isn't set on windows and generates a Notice.
         $path = isset($_SERVER['PWD']) ? $_SERVER['PWD'] : '';
         if (empty($path)) {
             $path = getcwd();
@@ -886,7 +886,7 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Gets Sugar full version information.
+     * Gets SugarCRM full version information.
      *
      * @param string $prop
      *   The property to retrieve, can be 'version', 'build' or 'flavor'.
@@ -901,7 +901,7 @@ class Kernel implements KernelInterface
 
         if (!array_key_exists($prop, $sugarInfo)) {
             throw new \InvalidArgumentException(sprintf(
-                'Unknown Sugar version property "%s".',
+                'Unknown SugarCRM version property "%s".',
                 $prop
             ));
         }

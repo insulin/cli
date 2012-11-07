@@ -2,8 +2,7 @@
     "name": "insulin/cli",
     "description": "Because too much sugar causes diabetes",
     "license": [
-        "LGPL-2.1",
-        "GPL-3.0+"
+        "MIT"
     ],
     "authors": [
         {
