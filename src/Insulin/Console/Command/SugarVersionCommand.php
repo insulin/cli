@@ -25,7 +25,7 @@ class SugarVersionCommand extends Command
     {
         $this
             ->setName('sugar:version')
-            ->setDescription('Print Sugar flavor, version and build number.')
+            ->setDescription('Print SugarCRM flavor, version and build number.')
             ->setHelp(
             <<<EOF
 The <info>sugar:version</info> command shows the current SugarCRM flavor, version and build number.
@@ -65,7 +65,7 @@ EOF
         );
         */
         $text = sprintf(
-            "Sugar %s %s build %s",
+            "SugarCRM %s %s build %s",
             $flavor,
             $version,
             $build

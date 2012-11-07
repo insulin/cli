@@ -56,7 +56,7 @@ class Application extends BaseApplication
             new InputOption('--process-isolation', null, InputOption::VALUE_NONE, 'Launch commands from shell as a separate processes.')
         );
         $definition->addOption(
-            new InputOption('--root', '-r', InputOption::VALUE_REQUIRED, 'Sugar root directory, defaults to current directory.')
+            new InputOption('--root', '-r', InputOption::VALUE_REQUIRED, 'Path to SugarCRM root directory, defaults to current directory.')
         );
 
         return $definition;
@@ -134,7 +134,7 @@ class Application extends BaseApplication
             // searchPath[] = '~/.insulin/Command';
         }
         if (Kernel::BOOT_SUGAR_ROOT <= $level) {
-            // TODO give support to commands on Sugar instance
+            // TODO give support to commands on SugarCRM instance
             // searchPath[] = $this->kernel->getSugarRoot() . 'custom/Insulin';
         }
 

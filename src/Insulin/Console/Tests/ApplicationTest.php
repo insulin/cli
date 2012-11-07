@@ -28,7 +28,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $insulinTester = new ApplicationTester($insulin);
         $insulinTester->run(array('command' => 'list'));
 
-        // FIXME add core commands like download sugar ce?
+        // FIXME add core commands like download SugarCRM ce?
     }
 
     public function testCoreCommandsAvailableWithBootSugarConfiguration()
