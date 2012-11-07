@@ -86,7 +86,7 @@ $sugar_timestamp    = \'2008-08-01 12:00am\';
         $commandTester->execute(array('command' => $command->getName()));
 
         $this->assertRegExp(
-            '/Sugar ENT 6.4.3 build 123/',
+            '/SugarCRM ENT 6.4.3 build 123/',
             $commandTester->getDisplay()
         );
     }
