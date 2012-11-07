@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+// FIXME Insulin commands need to extend from InsulinCommand so it requires an Insulin Application
 class SugarVersionCommand extends Command
 {
     protected function configure()
@@ -34,9 +35,11 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $flavor = $this->getApplication()->getSugarInfo('flavor');
-        $version = $this->getApplication()->getSugarInfo('version');
-        $build = $this->getApplication()->getSugarInfo('build');
+        $kernel = $this->getApplication()->getKernel();
+
+        $flavor = $kernel->getSugarInfo('flavor');
+        $version = $kernel->getSugarInfo('version');
+        $build = $kernel->getSugarInfo('build');
 
         /*
         if ($input->getOption('pipe')) {
