@@ -704,7 +704,7 @@ class Kernel implements KernelInterface
         }
 
         try {
-            $this->sugarRoot = $this->locateRoot();
+            $this->sugarRoot = $this->locateSugarRoot();
 
         } catch (\Exception $e) {
             // FIXME: replace exception below with
@@ -746,7 +746,7 @@ class Kernel implements KernelInterface
      * @return
      *   Path to SugarCRM root directory.
      */
-    public function locateRoot($startPath = null)
+    public function locateSugarRoot($startPath = null)
     {
         $sugarRoot = false;
 

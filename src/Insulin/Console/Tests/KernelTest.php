@@ -91,19 +91,19 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerLocateRoot
+     * @dataProvider providerLocateSugarRoot
      */
-    public function testLocateRoot($path, $expectedResult, $expectedException = null)
+    public function testLocateSugarRoot($path, $expectedResult, $expectedException = null)
     {
         if (!empty($expectedException)) {
             $this->setExpectedException($expectedException);
         }
 
         $kernel = new Kernel;
-        $this->assertEquals($expectedResult, $kernel->locateRoot($path));
+        $this->assertEquals($expectedResult, $kernel->locateSugarRoot($path));
     }
 
-    public function providerLocateRoot()
+    public function providerLocateSugarRoot()
     {
         return array(
             array(null, false, 'RuntimeException'),
