@@ -1,11 +1,4 @@
-# IDE files
-.idea
-
 # Symfony
-web/bundles/
-app/bootstrap.php.cache
-app/cache/*
-app/logs/*
 build/
 vendor
 bin
