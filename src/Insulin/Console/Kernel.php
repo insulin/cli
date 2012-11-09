@@ -266,12 +266,11 @@ class Kernel implements KernelInterface
      */
     public function shutdown()
     {
-        if (false === $this->booted) {
+        if (false === $this->isBooted()) {
             return;
         }
 
         $this->booted = false;
-
         $this->container = null;
     }
 

@@ -178,4 +178,18 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException')
         );
     }
+
+    public function testShutdownsWhenBooted()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('isBooted')
+        );
+        $kernel->expects($this->once())->method('isBooted')->will(
+            $this->returnValue(true)
+        );
+
+        $kernel->shutdown();
+        $this->assertNull($kernel->getContainer());
+    }
 }
