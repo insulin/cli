@@ -67,6 +67,83 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testConstructor()
+    {
+        $debug = true;
+
+        $kernel = new Kernel($debug);
+        $this->assertEquals($debug, $kernel->isDebug());
+        $this->assertFalse($kernel->isBooted());
+        $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
+        $this->assertNull($kernel->getContainer());
+    }
+
+    public function testClone()
+    {
+        $debug = true;
+        $kernel = new Kernel($debug);
+
+        $clone = clone $kernel;
+
+        $this->assertEquals($debug, $clone->isDebug());
+        $this->assertFalse($clone->isBooted());
+        $this->assertLessThanOrEqual(microtime(true), $clone->getStartTime());
+        $this->assertNull($clone->getContainer());
+    }
+
+    public function testGetRootDir()
+    {
+        $kernel = new Kernel();
+        $this->assertNotEmpty($kernel->getRootDir());
+    }
+
+    public function testGetCharset()
+    {
+        $kernel = new Kernel();
+        $this->assertSame('UTF-8', $kernel->getCharset());
+    }
+
+    public function testPerformanceBoot()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('getBootstrapLevels')
+        );
+        $kernel->expects($this->once())->method('getBootstrapLevels')->will(
+            $this->returnValue(array())
+        );
+
+        $kernel->boot();
+        $kernel->boot();
+    }
+
+    public function testBootInsulinLevel()
+    {
+        $debug = true;
+
+        $kernel = new Kernel($debug);
+        $bootLevel = $kernel->boot();
+
+        $this->assertSame(Kernel::BOOT_INSULIN, $bootLevel);
+        $this->assertTrue($kernel->isBooted());
+    }
+
+    public function testBootSugarRootLevel()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('getSugarRoot')
+        );
+        $kernel->expects($this->once())->method('getSugarRoot')->will(
+            $this->returnValue(self::$sugarRoot)
+        );
+
+        $bootLevel = $kernel->boot();
+
+        $this->assertSame(Kernel::BOOT_SUGAR_ROOT, $bootLevel);
+        $this->assertTrue($kernel->isBooted());
+    }
+
     /**
      * @dataProvider providerIsSugarRoot
      */
@@ -76,7 +153,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException($expectedException);
         }
 
-        $kernel = new Kernel;
+        $kernel = new Kernel();
         $this->assertEquals($kernel->isSugarRoot($path), $expectedResult);
     }
 
@@ -86,7 +163,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array(null, false, 'InvalidArgumentException'),
             array(sys_get_temp_dir() . '/insulin2_sugar', true),
             array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException'),
-            array(sys_get_temp_dir(), false)
+            array(sys_get_temp_dir(), false),
         );
     }
 
@@ -99,7 +176,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException($expectedException);
         }
 
-        $kernel = new Kernel;
+        $kernel = new Kernel();
         $this->assertEquals($expectedResult, $kernel->locateSugarRoot($path));
     }
 
@@ -110,7 +187,51 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array(sys_get_temp_dir(), false, 'RuntimeException'),
             array(sys_get_temp_dir() . '/insulin2_sugar', sys_get_temp_dir() . '/insulin2_sugar'),
             array(sys_get_temp_dir() . '/insulin2_sugar/include/MVC', sys_get_temp_dir() . '/insulin2_sugar'),
-            array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException')
+            array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException'),
+        );
+    }
+
+    public function testShutdownsWhenBooted()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('isBooted')
+        );
+        $kernel->expects($this->once())->method('isBooted')->will(
+            $this->returnValue(true)
+        );
+
+        $kernel->shutdown();
+        $this->assertNull($kernel->getContainer());
+    }
+
+    /**
+     * @dataProvider providerBootTo
+     */
+    public function testBootTo($level, $expectedResult, $expectedException = null)
+    {
+        if (!empty($expectedException)) {
+            $this->setExpectedException($expectedException);
+        }
+
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('getSugarRoot')
+        );
+        $kernel->expects($this->any())->method('getSugarRoot')->will(
+            $this->returnValue(self::$sugarRoot)
+        );
+
+        $this->assertEquals($expectedResult, $kernel->bootTo($level));
+    }
+
+    public function providerBootTo()
+    {
+        return array(
+            array(null, false, 'InvalidArgumentException'),
+            array(-1, false, 'InvalidArgumentException'),
+            array(Kernel::BOOT_INSULIN, true),
+            array(Kernel::BOOT_SUGAR_ROOT, true),
         );
     }
 }
