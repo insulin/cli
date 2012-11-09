@@ -151,7 +151,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array(null, false, 'InvalidArgumentException'),
             array(sys_get_temp_dir() . '/insulin2_sugar', true),
             array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException'),
-            array(sys_get_temp_dir(), false)
+            array(sys_get_temp_dir(), false),
         );
     }
 
@@ -175,7 +175,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array(sys_get_temp_dir(), false, 'RuntimeException'),
             array(sys_get_temp_dir() . '/insulin2_sugar', sys_get_temp_dir() . '/insulin2_sugar'),
             array(sys_get_temp_dir() . '/insulin2_sugar/include/MVC', sys_get_temp_dir() . '/insulin2_sugar'),
-            array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException')
+            array(sys_get_temp_dir() . '/unexistent_path', false, 'InvalidArgumentException'),
         );
     }
 
