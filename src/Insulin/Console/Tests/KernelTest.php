@@ -192,4 +192,34 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->shutdown();
         $this->assertNull($kernel->getContainer());
     }
+
+    /**
+     * @dataProvider providerBootTo
+     */
+    public function testBootTo($level, $expectedResult, $expectedException = null)
+    {
+        if (!empty($expectedException)) {
+            $this->setExpectedException($expectedException);
+        }
+
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('getSugarRoot')
+        );
+        $kernel->expects($this->any())->method('getSugarRoot')->will(
+            $this->returnValue(self::$sugarRoot)
+        );
+
+        $this->assertEquals($expectedResult, $kernel->bootTo($level));
+    }
+
+    public function providerBootTo()
+    {
+        return array(
+            array(null, false, 'InvalidArgumentException'),
+            array(-1, false, 'InvalidArgumentException'),
+            array(Kernel::BOOT_INSULIN, true),
+            array(Kernel::BOOT_SUGAR_ROOT, true),
+        );
+    }
 }

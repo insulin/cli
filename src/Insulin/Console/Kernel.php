@@ -244,6 +244,7 @@ class Kernel implements KernelInterface
                 if (!defined('sugarEntry')) {
                     define('sugarEntry', true);
                 }
+                return true;
                 break;
 
             // TODO give support to other run levels
