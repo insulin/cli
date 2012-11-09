@@ -33,6 +33,7 @@ class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
     protected $sugarRoot;
+    protected $container;
 
     const NAME = 'Insulin';
     const VERSION = '2.0';
@@ -299,10 +300,21 @@ class Kernel implements KernelInterface
     }
 
     /**
+     * Checks if is booted.
+     *
+     * @return Boolean
+     *   TRUE if is booted, FALSE otherwise.
+     */
+    public function isBooted()
+    {
+        return $this->booted;
+    }
+
+    /**
      * Checks if debug mode is enabled.
      *
      * @return Boolean
-     *   TRUE if debug mode is enabled, FALSE otherwise
+     *   TRUE if debug mode is enabled, FALSE otherwise.
      *
      * @api
      */

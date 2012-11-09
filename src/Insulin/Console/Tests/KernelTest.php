@@ -67,6 +67,30 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testConstructor()
+    {
+        $debug = true;
+
+        $kernel = new Kernel($debug);
+        $this->assertEquals($debug, $kernel->isDebug());
+        $this->assertFalse($kernel->isBooted());
+        $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
+        $this->assertNull($kernel->getContainer());
+    }
+
+    public function testClone()
+    {
+        $debug = true;
+        $kernel = new Kernel($debug);
+
+        $clone = clone $kernel;
+
+        $this->assertEquals($debug, $clone->isDebug());
+        $this->assertFalse($clone->isBooted());
+        $this->assertLessThanOrEqual(microtime(true), $clone->getStartTime());
+        $this->assertNull($clone->getContainer());
+    }
+
     /**
      * @dataProvider providerIsSugarRoot
      */
@@ -76,7 +100,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException($expectedException);
         }
 
-        $kernel = new Kernel;
+        $kernel = new Kernel();
         $this->assertEquals($kernel->isSugarRoot($path), $expectedResult);
     }
 
@@ -99,7 +123,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException($expectedException);
         }
 
-        $kernel = new Kernel;
+        $kernel = new Kernel();
         $this->assertEquals($expectedResult, $kernel->locateSugarRoot($path));
     }
 
