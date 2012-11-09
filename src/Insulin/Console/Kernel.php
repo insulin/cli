@@ -33,6 +33,7 @@ class Kernel implements KernelInterface
     protected $startTime;
     protected $classes;
     protected $sugarRoot;
+    protected $container;
 
     const NAME = 'Insulin';
     const VERSION = '2.0';
@@ -243,6 +244,7 @@ class Kernel implements KernelInterface
                 if (!defined('sugarEntry')) {
                     define('sugarEntry', true);
                 }
+                return true;
                 break;
 
             // TODO give support to other run levels
@@ -265,12 +267,11 @@ class Kernel implements KernelInterface
      */
     public function shutdown()
     {
-        if (false === $this->booted) {
+        if (false === $this->isBooted()) {
             return;
         }
 
         $this->booted = false;
-
         $this->container = null;
     }
 
@@ -299,10 +300,21 @@ class Kernel implements KernelInterface
     }
 
     /**
+     * Checks if is booted.
+     *
+     * @return Boolean
+     *   TRUE if is booted, FALSE otherwise.
+     */
+    public function isBooted()
+    {
+        return $this->booted;
+    }
+
+    /**
      * Checks if debug mode is enabled.
      *
      * @return Boolean
-     *   TRUE if debug mode is enabled, FALSE otherwise
+     *   TRUE if debug mode is enabled, FALSE otherwise.
      *
      * @api
      */
@@ -395,7 +407,7 @@ class Kernel implements KernelInterface
      */
     public function getCacheDir()
     {
-        return $this->rootDir . '/cache/insulin';
+        return $this->getRootDir() . '/cache/insulin';
     }
 
     /**
@@ -408,7 +420,7 @@ class Kernel implements KernelInterface
      */
     public function getLogDir()
     {
-        return $this->rootDir . '/logs';
+        return $this->getRootDir() . '/logs';
     }
 
     /**
