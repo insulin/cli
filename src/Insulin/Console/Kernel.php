@@ -407,7 +407,7 @@ class Kernel implements KernelInterface
      */
     public function getCacheDir()
     {
-        return $this->rootDir . '/cache/insulin';
+        return $this->getRootDir() . '/cache/insulin';
     }
 
     /**
@@ -420,7 +420,7 @@ class Kernel implements KernelInterface
      */
     public function getLogDir()
     {
-        return $this->rootDir . '/logs';
+        return $this->getRootDir() . '/logs';
     }
 
     /**

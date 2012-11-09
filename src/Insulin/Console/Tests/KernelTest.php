@@ -91,6 +91,18 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($clone->getContainer());
     }
 
+    public function testGetRootDir()
+    {
+        $kernel = new Kernel();
+        $this->assertNotEmpty($kernel->getRootDir());
+    }
+
+    public function testGetCharset()
+    {
+        $kernel = new Kernel();
+        $this->assertSame('UTF-8', $kernel->getCharset());
+    }
+
     public function testPerformanceBoot()
     {
         $kernel = $this->getMock(
