@@ -191,6 +191,31 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider providerSetSugarRoot
+     */
+    public function testSetSugarRoot($path, $expectedResult, $expectedException = null)
+    {
+        if (!empty($expectedException)) {
+            $this->setExpectedException($expectedException);
+        }
+
+        $kernel = new Kernel();
+        $kernel->setSugarRoot($path);
+        $this->assertEquals($expectedResult, $kernel->getSugarRoot());
+    }
+
+    public function providerSetSugarRoot()
+    {
+        return array(
+            array(null, null, 'RuntimeException'),
+            array('', null, 'RuntimeException'),
+            array(sys_get_temp_dir(), null, 'RuntimeException'),
+            array(sys_get_temp_dir() . '/insulin2_sugar', sys_get_temp_dir() . '/insulin2_sugar'),
+            array(sys_get_temp_dir() . '/insulin2_sugar/include/MVC', null, 'RuntimeException'),
+        );
+    }
+
     public function testShutdownsWhenBooted()
     {
         $kernel = $this->getMock(

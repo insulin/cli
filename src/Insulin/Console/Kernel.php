@@ -675,7 +675,7 @@ class Kernel implements KernelInterface
      * @return string
      *   The PHP string with the comments removed.
      */
-    public static function stripComments($source)
+    protected static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;
