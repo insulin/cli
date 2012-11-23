@@ -72,16 +72,16 @@ Get the Insulin CLI source code:
 
 * Create a [GitHub][GitHub signup] account and sign in;
 * Fork the [Insulin CLI repository][Insulin CLI repo] (click on the "Fork" button);
-* After the "hardcore forking action" has completed, clone your fork locally (this will create a `cli` directory):
+* After the "hardcore forking action" has completed, clone your fork locally (this will create a `insulin-cli` directory):
 
 ```bash
-$ git clone git@github.com:USERNAME/cli.git
+$ git clone git@github.com:USERNAME/cli.git insulin-cli
 ```
 
 * Add the upstream repository as `remote`:
 
 ```bash
-$ cd cli
+$ cd insulin-cli
 $ git remote add upstream git://github.com/insulin/cli.git
 ```
 
@@ -201,7 +201,7 @@ $ git push origin BRANCH_NAME
 
 You can now make a pull request on the `insulin/cli` Github repository.
 
-> Take care to point your pull request towards `insulin:2.0` if you want the core team to pull a bug fix based on the 2.x branch.
+> Take care to point your pull request towards `insulin:2.0` if you want the core team to pull a bug fix based on the 2.0 branch.
 
 To ease the core team work, always include the modified components in your pull request message, like in:
 
@@ -247,7 +247,7 @@ $ git rebase -f upstream/master
 $ git push -f origin BRANCH_NAME
 ```
 
-> when doing a ``push --force``, always specify the branch name explicitly to avoid messing other branches in the repo (``--force`` tells git that you really want to mess with things so do it carefully).
+> when doing a `push --force`, always specify the branch name explicitly to avoid messing other branches in the repo (`--force` tells git that you really want to mess with things so do it carefully).
 
 Often, moderators will ask you to "squash" your commits. This means you will convert many commits to one commit. To do this, use the rebase command:
 
