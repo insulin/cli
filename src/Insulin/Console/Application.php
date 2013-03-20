@@ -46,17 +46,34 @@ class Application extends BaseApplication
     protected function getDefaultInputDefinition()
     {
         $definition = parent::getDefaultInputDefinition();
-        $definition->addOption(
-            new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Switches on debug mode.')
-        );
-        $definition->addOption(
-            new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.')
-        );
-        $definition->addOption(
-            new InputOption('--process-isolation', null, InputOption::VALUE_NONE, 'Launch commands from shell as a separate processes.')
-        );
-        $definition->addOption(
-            new InputOption('--root', '-r', InputOption::VALUE_REQUIRED, 'Path to SugarCRM root directory, defaults to current directory.')
+
+        $definition->addOptions(
+            array(
+                new InputOption(
+                    '--debug',
+                    '-d',
+                    InputOption::VALUE_NONE,
+                    'Switches on debug mode.'
+                ),
+                new InputOption(
+                    '--shell',
+                    '-s',
+                    InputOption::VALUE_NONE,
+                    'Launch the shell.'
+                ),
+                new InputOption(
+                    '--process-isolation',
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Launch commands from shell as a separate processes.'
+                ),
+                new InputOption(
+                    '--root',
+                    '-r',
+                    InputOption::VALUE_REQUIRED,
+                    'Path to SugarCRM root directory, defaults to current directory.'
+                )
+            )
         );
 
         return $definition;
@@ -141,10 +158,12 @@ class Application extends BaseApplication
         // TODO make the other phase commands retrieval
 
         if (empty($searchPath)) {
-            throw new \RuntimeException(sprintf(
-                'No search path for commands available for run level "%s".',
-                $level
-            ));
+            throw new \RuntimeException(
+                sprintf(
+                    'No search path for commands available for run level "%s".',
+                    $level
+                )
+            );
         }
 
         $finder = new Finder();

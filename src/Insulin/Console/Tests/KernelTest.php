@@ -40,16 +40,16 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
         if (is_dir(self::$sugarRoot)) {
             self::tearDownAfterClass();
-        }
-        else {
+
+        } else {
             mkdir(self::$sugarRoot);
         }
 
         foreach (self::$sugarFiles as $file) {
             if ('/' === substr($file, -1) && !is_dir($file)) {
                 mkdir($file);
-            }
-            else {
+
+            } else {
                 touch($file);
             }
         }
@@ -60,8 +60,8 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         foreach (array_reverse(self::$sugarFiles) as $file) {
             if ('/' === substr($file, -1)) {
                 @rmdir($file);
-            }
-            else {
+
+            } else {
                 @unlink($file);
             }
         }
