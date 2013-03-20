@@ -105,14 +105,14 @@ class Kernel implements KernelInterface
     /**
      * Constructor.
      *
-     * @param Boolean $debug
+     * @param boolean $debug
      *   Whether to enable debugging or not.
      *
      * @api
      */
     public function __construct($debug = false)
     {
-        $this->debug = (Boolean) $debug;
+        $this->debug = (boolean) $debug;
         $this->booted = false;
         $this->classes = array();
 
@@ -236,15 +236,10 @@ class Kernel implements KernelInterface
         switch ($level) {
             case self::BOOT_INSULIN:
                 return true;
-                break;
             case self::BOOT_SUGAR_ROOT:
                 $this->getSugarRoot();
-
-                if (!defined('sugarEntry')) {
-                    define('sugarEntry', true);
-                }
+                defined('sugarEntry') || define('sugarEntry', true);
                 return true;
-                break;
             // TODO give support to other run levels
             default:
                 throw new \InvalidArgumentException(
@@ -253,7 +248,6 @@ class Kernel implements KernelInterface
                         $level
                     )
                 );
-                break;
         }
     }
 
@@ -304,7 +298,7 @@ class Kernel implements KernelInterface
      * Checks if is booted.
      *
      * @return Boolean
-     *   TRUE if is booted, FALSE otherwise.
+     *   True if is booted, false otherwise.
      */
     public function isBooted()
     {
@@ -315,7 +309,7 @@ class Kernel implements KernelInterface
      * Checks if debug mode is enabled.
      *
      * @return Boolean
-     *   TRUE if debug mode is enabled, FALSE otherwise.
+     *   True if debug mode is enabled, false otherwise.
      *
      * @api
      */
@@ -325,10 +319,10 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the insulin root dir.
+     * Gets the insulin root directory.
      *
      * @return string
-     *   The insulin root dir.
+     *   The insulin root directory.
      *
      * @api
      */
@@ -345,7 +339,8 @@ class Kernel implements KernelInterface
     /**
      * Gets the current container.
      *
-     * @return ContainerInterface A ContainerInterface instance
+     * @return ContainerInterface
+     *   A ContainerInterface instance.
      *
      * @api
      */
@@ -357,8 +352,10 @@ class Kernel implements KernelInterface
     /**
      * Loads the PHP class cache.
      *
-     * @param string $name      The cache name prefix
-     * @param string $extension File extension of the resulting file
+     * @param string $name
+     *   The cache name prefix.
+     * @param string $extension
+     *   File extension of the resulting file.
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
@@ -425,10 +422,10 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Gets the charset of the insulin.
+     * Gets the insulin charset.
      *
      * @return string
-     *   The charset
+     *   The charset.
      *
      * @api
      */
@@ -445,9 +442,10 @@ class Kernel implements KernelInterface
      */
     protected function getContainerClass()
     {
-        return $this->name . ucfirst(
-            $this->environment
-        ) . ($this->debug ? 'Debug' : '') . 'ProjectContainer';
+        return $this->name .
+          ucfirst($this->environment) .
+          ($this->debug ? 'Debug' : '') .
+          'ProjectContainer';
     }
 
     /**
@@ -465,8 +463,8 @@ class Kernel implements KernelInterface
     /**
      * Initializes the service container.
      *
-     * The cached version of the service container is used when fresh, otherwise the
-     * container is built.
+     * The cached version of the service container is used when fresh, otherwise
+     * the container is built.
      */
     protected function initializeContainer()
     {
@@ -504,7 +502,7 @@ class Kernel implements KernelInterface
      * Returns the kernel parameters.
      *
      * @return array
-     *   An array of kernel parameters
+     *   An array of kernel parameters.
      */
     protected function getKernelParameters()
     {
@@ -533,27 +531,25 @@ class Kernel implements KernelInterface
      * Only the parameters starting with "INSULIN__" are considered.
      *
      * @return array
-     *   An array of parameters
+     *   An array of parameters.
      */
     protected function getEnvParameters()
     {
-        $parameters = array();
-        foreach ($_SERVER as $key => $value) {
-            if (0 === strpos($key, 'INSULIN__')) {
-                $parameters[strtolower(
-                    str_replace('__', '.', substr($key, 9))
-                )] = $value;
+        $params = array();
+        foreach ($_SERVER as $k => $v) {
+            if (0 === strpos($k, 'INSULIN__')) {
+                $params[strtolower(str_replace('__', '.', substr($k, 9)))] = $v;
             }
         }
 
-        return $parameters;
+        return $params;
     }
 
     /**
      * Builds the service container.
      *
      * @return ContainerBuilder
-     *   The compiled service container
+     *   The compiled service container.
      */
     protected function buildContainer()
     {
@@ -566,7 +562,7 @@ class Kernel implements KernelInterface
                 if (false === @mkdir($dir, 0777, true)) {
                     throw new \RuntimeException(
                         sprintf(
-                            "Unable to create the %s directory (%s)\n",
+                            'Unable to create the "%s" directory "%s"',
                             $name,
                             $dir
                         )
@@ -576,7 +572,7 @@ class Kernel implements KernelInterface
             } elseif (!is_writable($dir)) {
                 throw new \RuntimeException(
                     sprintf(
-                        "Unable to write in the %s directory (%s)\n",
+                        'Unable to write in the "%s" directory "%s"',
                         $name,
                         $dir
                     )
@@ -626,13 +622,13 @@ class Kernel implements KernelInterface
      * Dumps the service container to PHP code in the cache.
      *
      * @param ConfigCache $cache
-     *   The config cache
+     *   The config cache.
      * @param ContainerBuilder $container
-     *   The service container
+     *   The service container.
      * @param string $class
-     *   The name of the class to generate
+     *   The name of the class to generate.
      * @param string $baseClass
-     *   The name of the container's base class
+     *   The name of the container's base class.
      */
     protected function dumpContainer(
         ConfigCache $cache,
@@ -655,9 +651,11 @@ class Kernel implements KernelInterface
     /**
      * Returns a loader for the container.
      *
-     * @param ContainerInterface $container The service container
+     * @param ContainerInterface $container
+     *   The service container.
      *
-     * @return DelegatingLoader The loader
+     * @return DelegatingLoader
+     *   The loader.
      */
     protected function getContainerLoader(ContainerInterface $container)
     {
@@ -752,7 +750,7 @@ class Kernel implements KernelInterface
             // throw Insulin\Console\Exception\InvalidSugarRoot
             throw new \RunTimeException(
                 sprintf(
-                    'Supplied SugarCRM root "%s" isn\'t valid',
+                    'Supplied SugarCRM root directory "%s" isn\'t valid',
                     $path
                 )
             );
@@ -767,7 +765,7 @@ class Kernel implements KernelInterface
      * the SugarCRM root.
      *
      * @param $startPath
-     *   Search start path. Defaults to current working directory.
+     *   Search start path, defaults to current working directory.
      *
      * @return
      *   Path to SugarCRM root directory.
@@ -775,7 +773,6 @@ class Kernel implements KernelInterface
     public function locateSugarRoot($startPath = null)
     {
         $sugarRoot = false;
-
         $startPath = empty($startPath) ? $this->getCwd() : $startPath;
 
         foreach (array(true, false) as $follow_symlinks) {
@@ -803,7 +800,9 @@ class Kernel implements KernelInterface
         }
 
         if (!$sugarRoot) {
-            throw new \RuntimeException('Unable to find a SugarCRM root.');
+            throw new \RuntimeException(
+                'Unable to find SugarCRM root directory.'
+            );
         }
 
         return $sugarRoot;
@@ -833,18 +832,18 @@ class Kernel implements KernelInterface
     /**
      * Checks whether given path qualifies as a SugarCRM root.
      *
-     * @param string
+     * @param string $path
      *   Path to check.
      *
      * @return boolean
-     *   TRUE if a SugarCRM root, FALSE otherwise.
+     *   True if supplied $path is a SugarCRM root directory, false otherwise.
      */
     public function isSugarRoot($path)
     {
         if (empty($path) || !is_dir($path)) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Invalid path given: "%s".',
+                    'Invalid path given "%s".',
                     $path
                 )
             );
@@ -947,7 +946,8 @@ class Kernel implements KernelInterface
         if (false === $sugarInfo[$prop]) {
             throw new \RuntimeException(
                 sprintf(
-                    'Unsupported version property "%s" in current SugarCRM instance "%s"',
+                    'Unsupported version property "%s" in current SugarCRM '
+                    .  ' instance "%s"',
                     $prop,
                     $this->getSugarRoot()
                 )

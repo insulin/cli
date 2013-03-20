@@ -28,7 +28,7 @@ class Application extends BaseApplication
      * Constructor.
      *
      * @param Kernel $kernel
-     *   A Kernel instance
+     *   A Kernel instance.
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -39,9 +39,11 @@ class Application extends BaseApplication
     /**
      * Gets the default input definition.
      *
-     * This overrides the parent default commands to allow a debug and pipe option.
+     * This overrides the parent default commands to allow a debug and pipe
+     * option.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
+     *   An InputDefinition instance.
      */
     protected function getDefaultInputDefinition()
     {
@@ -65,13 +67,14 @@ class Application extends BaseApplication
                     '--process-isolation',
                     null,
                     InputOption::VALUE_NONE,
-                    'Launch commands from shell as a separate processes.'
+                    'Launch commands from shell separate processes.'
                 ),
                 new InputOption(
                     '--root',
                     '-r',
                     InputOption::VALUE_REQUIRED,
-                    'Path to SugarCRM root directory, defaults to current directory.'
+                    'Path to SugarCRM root directory, defaults to current '
+                    .  'directory.'
                 )
             )
         );
@@ -82,20 +85,27 @@ class Application extends BaseApplication
     /**
      * Runs the current application.
      *
-     * @param InputInterface  $input  An Input instance
-     * @param OutputInterface $output An Output instance
+     * @param InputInterface $input
+     *   An Input instance.
+     * @param OutputInterface $output
+     *   An Output instance.
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return integer
+     *   0 if everything went fine, or an error code.
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->kernel->setSugarRoot($input->getParameterOption(array('--root', '-r'), null));
+        $this->kernel->setSugarRoot(
+            $input->getParameterOption(array('--root', '-r'), null)
+        );
 
         $this->registerCommands();
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
-            $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));
+            $shell->setProcessIsolation(
+                $input->hasParameterOption(array('--process-isolation'))
+            );
             $shell->run();
 
             return 0;
@@ -108,7 +118,7 @@ class Application extends BaseApplication
      * Gets the Insulin namespace.
      *
      * @return string
-     *   The Insulin namespace
+     *   The Insulin namespace.
      *
      * @api
      */
@@ -132,7 +142,6 @@ class Application extends BaseApplication
      * Registers Commands based on the boot level reached on the Kernel.
      *
      * Insulin commands follow the conventions:
-     *
      * * Commands are in the 'Command' sub-directory
      * * Commands extend Symfony\Component\Console\Command\Command
      */

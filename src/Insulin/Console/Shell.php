@@ -19,7 +19,8 @@ class Shell extends BaseShell
     /**
      * Returns the shell header.
      *
-     * @return string The header string
+     * @return string
+     *   The header string.
      */
     protected function getHeader()
     {

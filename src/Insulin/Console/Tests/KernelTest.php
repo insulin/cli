@@ -70,8 +70,8 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $debug = true;
-
         $kernel = new Kernel($debug);
+
         $this->assertEquals($debug, $kernel->isDebug());
         $this->assertFalse($kernel->isBooted());
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
@@ -82,7 +82,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     {
         $debug = true;
         $kernel = new Kernel($debug);
-
         $clone = clone $kernel;
 
         $this->assertEquals($debug, $clone->isDebug());
@@ -119,9 +118,8 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     public function testBootInsulinLevel()
     {
-        $debug = true;
-
-        $kernel = new Kernel($debug);
+        $debug     = true;
+        $kernel    = new Kernel($debug);
         $bootLevel = $kernel->boot();
 
         $this->assertSame(Kernel::BOOT_INSULIN, $bootLevel);

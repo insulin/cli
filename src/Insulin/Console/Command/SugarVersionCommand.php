@@ -51,7 +51,6 @@ EOF
         }
         */
 
-
         // TODO translations
         /*
         $translator = $this->getContainer()->get('translator');
@@ -64,13 +63,13 @@ EOF
             )
         );
         */
-        $text = sprintf(
-            "SugarCRM %s %s build %s",
-            $flavor,
-            $version,
-            $build
+        $output->writeln(
+            sprintf(
+                'SugarCRM %s %s build %s',
+                $flavor,
+                $version,
+                $build
+            )
         );
-
-        $output->writeln($text);
     }
 }
