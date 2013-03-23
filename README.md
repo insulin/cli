@@ -1,7 +1,7 @@
 Insulin
 =======
 
-Welcome to Insulin…
+Welcome to Insulin… [![Build Status](https://secure.travis-ci.org/insulin/cli.png?branch=master)](http://travis-ci.org/insulin/cli)
 
 1) Developing on insulin
 ------------------------
