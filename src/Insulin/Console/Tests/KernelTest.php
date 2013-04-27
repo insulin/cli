@@ -40,16 +40,14 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
         if (is_dir(self::$sugarRoot)) {
             self::tearDownAfterClass();
-        }
-        else {
+        } else {
             mkdir(self::$sugarRoot);
         }
 
         foreach (self::$sugarFiles as $file) {
             if ('/' === substr($file, -1) && !is_dir($file)) {
                 mkdir($file);
-            }
-            else {
+            } else {
                 touch($file);
             }
         }
@@ -60,8 +58,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         foreach (array_reverse(self::$sugarFiles) as $file) {
             if ('/' === substr($file, -1)) {
                 @rmdir($file);
-            }
-            else {
+            } else {
                 @unlink($file);
             }
         }
@@ -113,7 +110,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             $this->returnValue(array())
         );
 
+        // run once
         $kernel->boot();
+        // run twice (should be booted already)
         $kernel->boot();
     }
 
@@ -131,7 +130,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     public function testBootSugarRootLevel()
     {
         $kernel = $this->getMock(
-            'Insulin\Console\Kernel',
+            '\Insulin\Console\Kernel',
             array('getSugarRoot')
         );
         $kernel->expects($this->once())->method('getSugarRoot')->will(

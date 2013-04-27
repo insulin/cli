@@ -27,7 +27,7 @@ class Application extends BaseApplication
     /**
      * Constructor.
      *
-     * @param Kernel $kernel
+     * @param KernelInterface $kernel
      *   A Kernel instance
      */
     public function __construct(KernelInterface $kernel)
@@ -53,10 +53,20 @@ class Application extends BaseApplication
             new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.')
         );
         $definition->addOption(
-            new InputOption('--process-isolation', null, InputOption::VALUE_NONE, 'Launch commands from shell as a separate processes.')
+            new InputOption(
+                '--process-isolation',
+                null,
+                InputOption::VALUE_NONE,
+                'Launch commands from shell as a separate processes.'
+            )
         );
         $definition->addOption(
-            new InputOption('--root', '-r', InputOption::VALUE_REQUIRED, 'Path to SugarCRM root directory, defaults to current directory.')
+            new InputOption(
+                '--root',
+                '-r',
+                InputOption::VALUE_REQUIRED,
+                'Path to SugarCRM root directory, defaults to current directory.'
+            )
         );
 
         return $definition;
@@ -141,10 +151,12 @@ class Application extends BaseApplication
         // TODO make the other phase commands retrieval
 
         if (empty($searchPath)) {
-            throw new \RuntimeException(sprintf(
-                'No search path for commands available for run level "%s".',
-                $level
-            ));
+            throw new \RuntimeException(
+                sprintf(
+                    'No search path for commands available for run level "%s".',
+                    $level
+                )
+            );
         }
 
         $finder = new Finder();

@@ -36,8 +36,7 @@ class SugarVersionCommandTest extends \PHPUnit_Framework_TestCase
 
         if (is_dir(self::$sugarRoot)) {
             self::tearDownAfterClass();
-        }
-        else {
+        } else {
             mkdir(self::$sugarRoot);
         }
 
