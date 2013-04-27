@@ -47,7 +47,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     /**
      * Gets a mock kernel to test the Insulin Application.
      *
-     * @param $level
+     * @param int $level
      *   The level of the boot reached.
      *
      * @return KernelInterface

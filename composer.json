@@ -1,6 +1,8 @@
 {
     "name": "insulin/cli",
-    "description": "Because too much sugar causes diabetes",
+    "description": "'Cause too much Sugar causes diabetes!",
+    "keywords": "sugarcrm, cli",
+    "homepage": "http://cli.sugarmeetsinsulin.com",
     "license": [
         "MIT"
     ],

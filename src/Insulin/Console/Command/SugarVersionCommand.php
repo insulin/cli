@@ -24,13 +24,13 @@ class SugarVersionCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('sugar:version')
-            ->setDescription('Print SugarCRM flavor, version and build number.')
-            ->setHelp(
-            <<<EOF
+          ->setName('sugar:version')
+          ->setDescription('Print SugarCRM flavor, version and build number.')
+          ->setHelp(
+              <<<EOF
 The <info>sugar:version</info> command shows the current SugarCRM flavor, version and build number.
 EOF
-        );
+          );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -51,7 +51,6 @@ EOF
         }
         */
 
-
         // TODO translations
         /*
         $translator = $this->getContainer()->get('translator');
@@ -64,13 +63,13 @@ EOF
             )
         );
         */
-        $text = sprintf(
-            "SugarCRM %s %s build %s",
-            $flavor,
-            $version,
-            $build
+        $output->writeln(
+            sprintf(
+                'SugarCRM %s %s build %s',
+                $flavor,
+                $version,
+                $build
+            )
         );
-
-        $output->writeln($text);
     }
 }

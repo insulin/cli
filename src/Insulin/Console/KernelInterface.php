@@ -74,7 +74,7 @@ interface KernelInterface extends \Serializable
      * Checks if debug mode is enabled.
      *
      * @return Boolean
-     *   TRUE if debug mode is enabled, FALSE otherwise.
+     *   True if debug mode is enabled, false otherwise.
      *
      * @api
      */
@@ -84,7 +84,7 @@ interface KernelInterface extends \Serializable
      * Gets the application root dir.
      *
      * @return string
-     *   The application root dir
+     *   The application root directory.
      *
      * @api
      */
@@ -131,7 +131,7 @@ interface KernelInterface extends \Serializable
     public function getLogDir();
 
     /**
-     * Gets the charset of the application.
+     * Gets the application charset.
      *
      * @return string
      *   The charset.

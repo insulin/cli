@@ -28,7 +28,7 @@ class Application extends BaseApplication
      * Constructor.
      *
      * @param Kernel $kernel
-     *   A Kernel instance
+     *   A Kernel instance.
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -39,24 +39,44 @@ class Application extends BaseApplication
     /**
      * Gets the default input definition.
      *
-     * This overrides the parent default commands to allow a debug and pipe option.
+     * This overrides the parent default commands to allow a debug and pipe
+     * option.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return InputDefinition
+     *   An InputDefinition instance.
      */
     protected function getDefaultInputDefinition()
     {
         $definition = parent::getDefaultInputDefinition();
-        $definition->addOption(
-            new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Switches on debug mode.')
-        );
-        $definition->addOption(
-            new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.')
-        );
-        $definition->addOption(
-            new InputOption('--process-isolation', null, InputOption::VALUE_NONE, 'Launch commands from shell as a separate processes.')
-        );
-        $definition->addOption(
-            new InputOption('--root', '-r', InputOption::VALUE_REQUIRED, 'Path to SugarCRM root directory, defaults to current directory.')
+
+        $definition->addOptions(
+            array(
+                new InputOption(
+                    '--debug',
+                    '-d',
+                    InputOption::VALUE_NONE,
+                    'Switches on debug mode.'
+                ),
+                new InputOption(
+                    '--shell',
+                    '-s',
+                    InputOption::VALUE_NONE,
+                    'Launch the shell.'
+                ),
+                new InputOption(
+                    '--process-isolation',
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Launch commands from shell separate processes.'
+                ),
+                new InputOption(
+                    '--root',
+                    '-r',
+                    InputOption::VALUE_REQUIRED,
+                    'Path to SugarCRM root directory, defaults to current '
+                    .  'directory.'
+                )
+            )
         );
 
         return $definition;
@@ -65,20 +85,27 @@ class Application extends BaseApplication
     /**
      * Runs the current application.
      *
-     * @param InputInterface  $input  An Input instance
-     * @param OutputInterface $output An Output instance
+     * @param InputInterface $input
+     *   An Input instance.
+     * @param OutputInterface $output
+     *   An Output instance.
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return integer
+     *   0 if everything went fine, or an error code.
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->kernel->setSugarRoot($input->getParameterOption(array('--root', '-r'), null));
+        $this->kernel->setSugarRoot(
+            $input->getParameterOption(array('--root', '-r'), null)
+        );
 
         $this->registerCommands();
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
             $shell = new Shell($this);
-            $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));
+            $shell->setProcessIsolation(
+                $input->hasParameterOption(array('--process-isolation'))
+            );
             $shell->run();
 
             return 0;
@@ -91,7 +118,7 @@ class Application extends BaseApplication
      * Gets the Insulin namespace.
      *
      * @return string
-     *   The Insulin namespace
+     *   The Insulin namespace.
      *
      * @api
      */
@@ -115,7 +142,6 @@ class Application extends BaseApplication
      * Registers Commands based on the boot level reached on the Kernel.
      *
      * Insulin commands follow the conventions:
-     *
      * * Commands are in the 'Command' sub-directory
      * * Commands extend Symfony\Component\Console\Command\Command
      */
@@ -141,10 +167,12 @@ class Application extends BaseApplication
         // TODO make the other phase commands retrieval
 
         if (empty($searchPath)) {
-            throw new \RuntimeException(sprintf(
-                'No search path for commands available for run level "%s".',
-                $level
-            ));
+            throw new \RuntimeException(
+                sprintf(
+                    'No search path for commands available for run level "%s".',
+                    $level
+                )
+            );
         }
 
         $finder = new Finder();
