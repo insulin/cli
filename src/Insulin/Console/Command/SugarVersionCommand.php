@@ -27,10 +27,10 @@ class SugarVersionCommand extends Command
             ->setName('sugar:version')
             ->setDescription('Print SugarCRM flavor, version and build number.')
             ->setHelp(
-            <<<EOF
+                <<<EOF
 The <info>sugar:version</info> command shows the current SugarCRM flavor, version and build number.
 EOF
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
