@@ -41,7 +41,8 @@ class Application extends BaseApplication
      *
      * This overrides the parent default commands to allow a debug and pipe option.
      *
-     * @return InputDefinition An InputDefinition instance
+     * @return \Symfony\Component\Console\Input\InputDefinition
+     *   An InputDefinition instance.
      */
     protected function getDefaultInputDefinition()
     {
@@ -62,10 +63,10 @@ class Application extends BaseApplication
         );
         $definition->addOption(
             new InputOption(
-                '--root',
-                '-r',
+                '--path',
+                '-p',
                 InputOption::VALUE_REQUIRED,
-                'Path to SugarCRM root directory, defaults to current directory.'
+                'Path to SugarCRM instance root directory, defaults to current directory if none supplied.'
             )
         );
 
@@ -75,14 +76,14 @@ class Application extends BaseApplication
     /**
      * Runs the current application.
      *
-     * @param InputInterface  $input  An Input instance
+     * @param InputInterface $input  An Input instance
      * @param OutputInterface $output An Output instance
      *
      * @return integer 0 if everything went fine, or an error code
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        $this->kernel->setSugarRoot($input->getParameterOption(array('--root', '-r'), null));
+        $this->kernel->setSugarPath($input->getParameterOption(array('--path', '-p'), null));
 
         $this->registerCommands();
 
@@ -136,7 +137,6 @@ class Application extends BaseApplication
         $searchPath = array();
 
         if (Kernel::BOOT_INSULIN <= $level) {
-
             if ($dir = realpath($this->kernel->getRootDir() . '/Command')) {
                 $searchPath[] = $dir;
             }
@@ -145,7 +145,7 @@ class Application extends BaseApplication
         }
         if (Kernel::BOOT_SUGAR_ROOT <= $level) {
             // TODO give support to commands on SugarCRM instance
-            // searchPath[] = $this->kernel->getSugarRoot() . 'custom/Insulin';
+            // $searchPath[] = $this->kernel->get('sugar')->getPath() . '/custom/Insulin';
         }
 
         // TODO make the other phase commands retrieval
@@ -163,6 +163,7 @@ class Application extends BaseApplication
         $finder->files()->name('*Command.php')->in($searchPath);
 
         $prefix = $this->getNamespace() . '\\Command';
+        /* @var $file \Symfony\Component\Finder\SplFileInfo */
         foreach ($finder as $file) {
             $ns = $prefix;
             if ($relativePath = $file->getRelativePath()) {
@@ -171,8 +172,7 @@ class Application extends BaseApplication
             $r = new \ReflectionClass($ns . '\\' . $file->getBasename('.php'));
             if ($r->isSubclassOf(
                 'Symfony\\Component\\Console\\Command\\Command'
-            ) && !$r->isAbstract()
-            ) {
+            ) && !$r->isAbstract()) {
                 $this->add($r->newInstance());
             }
         }
