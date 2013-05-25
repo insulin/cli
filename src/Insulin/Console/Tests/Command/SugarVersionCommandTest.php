@@ -21,41 +21,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 class SugarVersionCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var string
-     */
-    protected static $sugarRoot;
-
-    /**
      * @var Application
      */
     protected $insulin;
-
-    public static function setupBeforeClass()
-    {
-        self::$sugarRoot = sys_get_temp_dir() . '/insulin2_sugar';
-
-        if (is_dir(self::$sugarRoot)) {
-            self::tearDownAfterClass();
-        } else {
-            mkdir(self::$sugarRoot);
-        }
-
-        file_put_contents(
-            self::$sugarRoot . '/sugar_version.php',
-            '<?php
-$sugar_version      = \'6.4.3\';
-$sugar_db_version   = \'6.4.3\';
-$sugar_flavor       = \'ENT\';
-$sugar_build        = \'123\';
-$sugar_timestamp    = \'2008-08-01 12:00am\';
-'
-        );
-    }
-
-    public static function tearDownAfterClass()
-    {
-        @unlink(self::$sugarRoot . '/sugar_version.php');
-    }
 
     protected function setUp()
     {
@@ -91,6 +59,20 @@ $sugar_timestamp    = \'2008-08-01 12:00am\';
     }
 
     /**
+     * @expectedException \Exception
+     */
+    public function testExecutionRequirements()
+    {
+        $kernel = $this->getKernel(Kernel::BOOT_INSULIN);
+        $insulin = new Application($kernel);
+        $insulin->setAutoExit(false);
+        $insulin->add(new SugarVersionCommand());
+        $command = $insulin->find('sugar:version');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array('command' => $command->getName()));
+    }
+
+    /**
      * Gets a mock kernel to test the Insulin Application.
      *
      * @param $level
@@ -100,9 +82,22 @@ $sugar_timestamp    = \'2008-08-01 12:00am\';
      */
     private function getKernel($level)
     {
+        $sugar = $this->getMock(
+            'Insulin\Sugar\Sugar',
+            array('getInfo')
+        );
+        $map = array(
+            array('flavor', false, 'ENT'),
+            array('version', false, '6.4.3'),
+            array('build', false, '123'),
+        );
+        $sugar->expects($this->any())->method('getInfo')->will(
+            $this->returnValueMap($map)
+        );
+
         $kernel = $this->getMock(
             'Insulin\Console\Kernel',
-            array('boot', 'getRootDir', 'getSugarRoot')
+            array('boot', 'getRootDir', 'get')
         );
         $kernel->expects($this->any())->method('boot')->will(
             $this->returnValue($level)
@@ -110,8 +105,8 @@ $sugar_timestamp    = \'2008-08-01 12:00am\';
         $kernel->expects($this->any())->method('getRootDir')->will(
             $this->returnValue(dirname(dirname(__DIR__)))
         );
-        $kernel->expects($this->any())->method('getSugarRoot')->will(
-            $this->returnValue(self::$sugarRoot)
+        $kernel->expects($this->any())->method('get')->with('sugar')->will(
+            $this->returnValue($sugar)
         );
 
         return $kernel;

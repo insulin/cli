@@ -12,10 +12,11 @@
 
 namespace Insulin\Console;
 
+use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * The Kernel is the heart of the Insulin system.
@@ -24,7 +25,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  *
  * @api
  */
-class Kernel implements KernelInterface
+class Kernel extends ContainerAware implements KernelInterface
 {
     protected $rootDir;
     protected $debug;
@@ -32,8 +33,7 @@ class Kernel implements KernelInterface
     protected $bootLevel;
     protected $startTime;
     protected $classes;
-    protected $sugarRoot;
-    protected $container;
+    protected $sugarPath;
 
     const NAME = 'Insulin';
     const VERSION = '2.0';
@@ -41,66 +41,6 @@ class Kernel implements KernelInterface
     const MINOR_VERSION = '0';
     const RELEASE_VERSION = '0';
     const EXTRA_VERSION = '';
-
-    /**
-     * Only bootstrap Insulin, without any SugarCRM specific code.
-     *
-     * Any code that operates on the Insulin installation, and not specifically
-     * any SugarCRM directory, should bootstrap to this phase.
-     */
-    const BOOT_INSULIN = 1;
-
-    /**
-     * Set up and test for a valid SugarCRM root, either through the -r/--root options,
-     * or evaluated based on the current working directory.
-     *
-     * Any code that interacts with an entire SugarCRM installation, and not a specific
-     * site on the SugarCRM installation should use this bootstrap phase.
-     */
-    const BOOT_SUGAR_ROOT = 2;
-
-    /**
-     * Load the settings from the SugarCRM sites directory.
-     *
-     * This phase is commonly used for code that interacts with the SugarCRM install API,
-     * as both install.php and update.php start at this phase.
-     */
-    const BOOT_SUGAR_CONFIGURATION = 3;
-
-    /**
-     * Connect to the SugarCRM database using the database credentials loaded
-     * during the previous bootstrap phase.
-     *
-     * Any code that needs to interact with the SugarCRM database API needs to
-     * be bootstrapped to at least this phase.
-     */
-    const BOOT_SUGAR_DATABASE = 4;
-
-    /**
-     * Fully initialize SugarCRM.
-     *
-     * Any code that interacts with the general SugarCRM API should be
-     * bootstrapped to this phase.
-     */
-    const BOOT_SUGAR_FULL = 5;
-
-    /**
-     * Log in to the initialized SugarCRM site.
-     *
-     * This is the default bootstrap phase all commands will try to reach,
-     * unless otherwise specified.
-     *
-     * This bootstrap phase is used after the site has been
-     * fully bootstrapped.
-     *
-     * This phase will log you in to the SugarCRM site with the username
-     * or user ID specified by the --user/ -u option.
-     *
-     * Use this bootstrap phase for your command if you need to have access
-     * to information for a specific user, such as listing nodes that might
-     * be different based on who is logged in.
-     */
-    const BOOT_SUGAR_LOGIN = 6;
 
     /**
      * Constructor.
@@ -154,6 +94,8 @@ class Kernel implements KernelInterface
             return $this->bootLevel;
         }
 
+        $this->initializeContainer();
+
         //$name = $this->getCommandName($input);
         // FIXME we don't need to bootstrap to last run level if we are already running a command
         /*
@@ -194,15 +136,15 @@ class Kernel implements KernelInterface
                 )
             );
             */
+            $this->booted = $bootLevel > 0;
+            $this->bootLevel = $bootLevel;
+            return $bootLevel;
         }
         if ($this->isDebug()) {
             /*
             $output->writeln(sprintf('Max phase reached "%d".', $maxPhase));
             */
         }
-
-        // TODO init container
-        //$this->initializeContainer();
 
         $this->booted = true;
         $this->bootLevel = $bootLevel;
@@ -229,7 +171,6 @@ class Kernel implements KernelInterface
         return $result;
     }
 
-
     public function bootTo($level)
     {
         switch ($level) {
@@ -237,7 +178,12 @@ class Kernel implements KernelInterface
                 return true;
                 break;
             case self::BOOT_SUGAR_ROOT:
-                $this->getSugarRoot();
+                $path = $this->sugarPath;
+                if (!empty($path)) {
+                    $this->get('sugar')->setPath($path);
+                } else {
+                    $this->get('sugar')->setPath($this->getCwd(), true);
+                }
 
                 if (!defined('sugarEntry')) {
                     define('sugarEntry', true);
@@ -344,33 +290,14 @@ class Kernel implements KernelInterface
     /**
      * Gets the current container.
      *
-     * @return ContainerInterface A ContainerInterface instance
+     * @return \Symfony\Component\DependencyInjection\ContainerInterface
+     *   A ContainerInterface instance.
      *
      * @api
      */
     public function getContainer()
     {
         return $this->container;
-    }
-
-    /**
-     * Loads the PHP class cache.
-     *
-     * @param string $name      The cache name prefix
-     * @param string $extension File extension of the resulting file
-     */
-    public function loadClassCache($name = 'classes', $extension = '.php')
-    {
-        if (!$this->booted && is_file($this->getCacheDir() . '/classes.map')) {
-            ClassCollectionLoader::load(
-                include($this->getCacheDir() . '/classes.map'),
-                $this->getCacheDir(),
-                $name,
-                $this->debug,
-                false,
-                $extension
-            );
-        }
     }
 
     /**
@@ -444,9 +371,7 @@ class Kernel implements KernelInterface
      */
     protected function getContainerClass()
     {
-        return $this->name . ucfirst(
-            $this->environment
-        ) . ($this->debug ? 'Debug' : '') . 'ProjectContainer';
+        return $this->getName() . ($this->debug ? 'Debug' : '') . 'ProjectContainer';
     }
 
     /**
@@ -489,6 +414,9 @@ class Kernel implements KernelInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
+        // FIXME: this should be made through configurable dependency injection
+        $this->container->set('sugar', new \Insulin\Sugar\Sugar());
+
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp(
                 $this->container->getParameter('kernel.cache_dir')
@@ -504,11 +432,6 @@ class Kernel implements KernelInterface
      */
     protected function getKernelParameters()
     {
-        $bundles = array();
-        foreach ($this->bundles as $name => $bundle) {
-            $bundles[$name] = get_class($bundle);
-        }
-
         return array_merge(
             array(
                 'kernel.root_dir' => $this->rootDir,
@@ -582,24 +505,8 @@ class Kernel implements KernelInterface
         }
 
         $container = $this->getContainerBuilder();
-        $extensions = array();
-        // TODO cache commands
 
         $container->addObjectResource($this);
-
-        // ensure these extensions are implicitly loaded
-        $container->getCompilerPassConfig()->setMergePass(
-            new MergeExtensionConfigurationPass($extensions)
-        );
-
-        $cont = $this->registerContainerConfiguration(
-            $this->getContainerLoader($container)
-        );
-        if (null !== $cont) {
-            $container->merge($cont);
-        }
-
-        $container->addCompilerPass(new AddClassesToCachePass($this));
         $container->compile();
 
         return $container;
@@ -643,29 +550,6 @@ class Kernel implements KernelInterface
         }
 
         $cache->write($content, $container->getResources());
-    }
-
-    /**
-     * Returns a loader for the container.
-     *
-     * @param ContainerInterface $container The service container
-     *
-     * @return DelegatingLoader The loader
-     */
-    protected function getContainerLoader(ContainerInterface $container)
-    {
-        $locator = new FileLocator($this);
-        $resolver = new LoaderResolver(
-            array(
-                new XmlFileLoader($container, $locator),
-                new YamlFileLoader($container, $locator),
-                new IniFileLoader($container, $locator),
-                new PhpFileLoader($container, $locator),
-                new ClosureLoader($container),
-            )
-        );
-
-        return new DelegatingLoader($resolver);
     }
 
     /**
@@ -713,153 +597,6 @@ class Kernel implements KernelInterface
         $this->__construct($debug);
     }
 
-    public function getSugarRoot()
-    {
-        if ($this->sugarRoot) {
-            return $this->sugarRoot;
-        }
-
-        try {
-            $this->sugarRoot = $this->locateSugarRoot();
-
-        } catch (\Exception $e) {
-            // FIXME: replace exception below with
-            // re throw Insulin\Console\Exception\SugarRootNotFound if no
-            // SugarCRM version found on the path given
-            throw $e;
-        }
-
-        return $this->sugarRoot;
-    }
-
-    public function setSugarRoot($path)
-    {
-        if (empty($path)) {
-            $this->sugarRoot = null;
-            return;
-        }
-
-        if (!$this->isSugarRoot($path)) {
-            // FIXME: replace exception below with
-            // throw Insulin\Console\Exception\InvalidSugarRoot
-            throw new \RunTimeException(
-                sprintf(
-                    'Supplied SugarCRM root "%s" isn\'t valid',
-                    $path
-                )
-            );
-        }
-
-        $this->sugarRoot = $path;
-    }
-
-    /**
-     * Exhaustive depth-first search to try and locate the SugarCRM root
-     * directory. This makes it possible to run insulin from a subdirectory of
-     * the SugarCRM root.
-     *
-     * @param string $startPath
-     *   (optional) Search start path, defaults to current working directory.
-     *
-     * @return string
-     *   Path to SugarCRM root directory.
-     *
-     * @throws \RuntimeException if unable to find a SugarCRM root.
-     */
-    public function locateSugarRoot($startPath = null)
-    {
-        $sugarRoot = false;
-
-        $startPath = empty($startPath) ? $this->getCwd() : $startPath;
-
-        foreach (array(true, false) as $follow_symlinks) {
-            $path = $startPath;
-            if ($follow_symlinks && is_link($path)) {
-                $path = realpath($path);
-            }
-            // Check the start path.
-            if ($this->isSugarRoot($path)) {
-                $sugarRoot = $path;
-                break;
-            } else {
-                // Move up dir by dir and check each.
-                while ($path = $this->shiftPathUp($path)) {
-                    if ($follow_symlinks && is_link($path)) {
-                        $path = realpath($path);
-                    }
-                    if ($this->isSugarRoot($path)) {
-                        $sugarRoot = $path;
-                        break 2;
-                    }
-                }
-            }
-        }
-
-        if (!$sugarRoot) {
-            throw new \RuntimeException('Unable to find a SugarCRM root.');
-        }
-
-        return $sugarRoot;
-    }
-
-    /**
-     * Returns parent directory.
-     *
-     * @param string
-     *   Path to start from.
-     *
-     * @return string
-     *   Parent path of given path.
-     */
-    protected function shiftPathUp($path)
-    {
-        if (empty($path)) {
-            return false;
-        }
-        $path = explode('/', $path);
-        // Move one directory up.
-        array_pop($path);
-
-        return implode('/', $path);
-    }
-
-    /**
-     * Checks whether given path qualifies as a SugarCRM root.
-     *
-     * @param string $path
-     *   Path to check.
-     *
-     * @return boolean
-     *   TRUE if a SugarCRM root, FALSE otherwise.
-     *
-     * @throws \InvalidArgumentException if an invalid $path is given.
-     */
-    public function isSugarRoot($path)
-    {
-        if (empty($path) || !is_dir($path)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Invalid path given: "%s".',
-                    $path
-                )
-            );
-        }
-
-        $candidates = array(
-            'include/entryPoint.php',
-            'include/MVC/SugarApplication.php',
-            'config.php',
-            'sugar_version.php'
-        );
-        foreach ($candidates as $candidate) {
-            if (!file_exists($path . '/' . $candidate)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     /**
      * Returns the current working directory.
      *
@@ -902,56 +639,39 @@ class Kernel implements KernelInterface
         return $path;
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
-    {
-        $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
-        // TODO load other configuration files like in ~/.insulin
-    }
-
     /**
-     * Gets SugarCRM full version information.
+     * Sets the path for the current SugarCRM instance.
      *
-     * @param string $prop
-     *   The property to retrieve, can be 'version', 'build' or 'flavor'.
+     * @param string $path
+     *   Path to a SugarCRM instance root directory.
      *
      * @throws \InvalidArgumentException if invalid $prop given.
      * @throws \RuntimeException if unsupported property requested for current SugarCRM instance.
+     *
+     * @return Kernel
+     *   Kernel instance.
+     *
+     * @api
      */
-    public function getSugarInfo($prop = 'version')
+    public function setSugarPath($path)
     {
-        static $sugarInfo = array(
-            'flavor' => false,
-            'version' => false,
-            'build' => false,
-        );
+        $this->sugarPath = $path;
+        return $this;
+    }
 
-        if (!array_key_exists($prop, $sugarInfo)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Unknown SugarCRM version property "%s".',
-                    $prop
-                )
-            );
-        }
-
-        if (false === $sugarInfo[$prop]) {
-            include $this->getSugarRoot() . '/sugar_version.php';
-            foreach ($sugarInfo as $k => $v) {
-                $field = 'sugar_' . $k;
-                $sugarInfo[$k] = $$field;
-            }
-        }
-
-        if (false === $sugarInfo[$prop]) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Unsupported version property "%s" in current SugarCRM instance "%s"',
-                    $prop,
-                    $this->getSugarRoot()
-                )
-            );
-        }
-
-        return $sugarInfo[$prop];
+    /**
+     * Gets a service by id.
+     *
+     * @param string $id
+     *  Service id.
+     *
+     * @return object
+     *   Service instance.
+     *
+     * @api
+     */
+    public function get($id)
+    {
+        return $this->container->get($id);
     }
 }
