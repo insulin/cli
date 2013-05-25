@@ -35,11 +35,19 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /* @var $kernel \Insulin\Console\KernelInterface */
         $kernel = $this->getApplication()->getKernel();
 
-        $flavor = $kernel->getSugarInfo('flavor');
-        $version = $kernel->getSugarInfo('version');
-        $build = $kernel->getSugarInfo('build');
+        if ($kernel->boot() < $kernel::BOOT_SUGAR_ROOT) {
+            // FIXME change this to a common exception to be used by all commands
+            throw new \Exception('Cannot execute command, no SugarCRM instance found.');
+        }
+
+        $sugar = $kernel->get('sugar');
+
+        $flavor = $sugar->getInfo('flavor');
+        $version = $sugar->getInfo('version');
+        $build = $sugar->getInfo('build');
 
         /*
         if ($input->getOption('pipe')) {

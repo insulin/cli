@@ -10,8 +10,9 @@
         convertWarningsToExceptions = "true"
         processIsolation            = "false"
         stopOnFailure               = "false"
+        strict                      = "true"
         syntaxCheck                 = "false"
-        bootstrap                   = "autoload.php" >
+        bootstrap                   = "autoload.php">
 
     <testsuites>
         <testsuite name="Insulin Test Suite">

@@ -13,7 +13,6 @@
 namespace Insulin\Console;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Config\Loader\LoaderInterface;
 
 /**
  * The Kernel is the heart of the Insulin system.
@@ -24,15 +23,66 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  */
 interface KernelInterface extends \Serializable
 {
+
     /**
-     * Loads the container configuration
+     * Only bootstrap Insulin, without any SugarCRM specific code.
      *
-     * @param LoaderInterface $loader
-     *   A LoaderInterface instance.
-     *
-     * @api
+     * Any code that operates on the Insulin installation, and not specifically
+     * any SugarCRM directory, should bootstrap to this phase.
      */
-    public function registerContainerConfiguration(LoaderInterface $loader);
+    const BOOT_INSULIN = 1;
+
+    /**
+     * Set up and test for a valid SugarCRM root, either through the -r/--root options,
+     * or evaluated based on the current working directory.
+     *
+     * Any code that interacts with an entire SugarCRM installation, and not a specific
+     * site on the SugarCRM installation should use this bootstrap phase.
+     */
+    const BOOT_SUGAR_ROOT = 2;
+
+    /**
+     * Load the settings from the SugarCRM sites directory.
+     *
+     * This phase is commonly used for code that interacts with the SugarCRM install API,
+     * as both install.php and update.php start at this phase.
+     */
+    const BOOT_SUGAR_CONFIGURATION = 3;
+
+    /**
+     * Connect to the SugarCRM database using the database credentials loaded
+     * during the previous bootstrap phase.
+     *
+     * Any code that needs to interact with the SugarCRM database API needs to
+     * be bootstrapped to at least this phase.
+     */
+    const BOOT_SUGAR_DATABASE = 4;
+
+    /**
+     * Fully initialize SugarCRM.
+     *
+     * Any code that interacts with the general SugarCRM API should be
+     * bootstrapped to this phase.
+     */
+    const BOOT_SUGAR_FULL = 5;
+
+    /**
+     * Log in to the initialized SugarCRM site.
+     *
+     * This is the default bootstrap phase all commands will try to reach,
+     * unless otherwise specified.
+     *
+     * This bootstrap phase is used after the site has been
+     * fully bootstrapped.
+     *
+     * This phase will log you in to the SugarCRM site with the username
+     * or user ID specified by the --user/ -u option.
+     *
+     * Use this bootstrap phase for your command if you need to have access
+     * to information for a specific user, such as listing nodes that might
+     * be different based on who is logged in.
+     */
+    const BOOT_SUGAR_LOGIN = 6;
 
     /**
      * Boots the current kernel.
@@ -139,4 +189,29 @@ interface KernelInterface extends \Serializable
      * @api
      */
     public function getCharset();
+
+
+    /**
+     * Sets the path for the current SugarCRM instance.
+     *
+     * @param string $path
+     *   Path to a SugarCRM instance root directory.
+     *
+     * @return Kernel
+     *   Kernel instance.
+     *
+     * @api
+     */
+    public function setSugarPath($path);
+
+    /**
+     * Gets a service by id.
+     *
+     * @param string $id
+     *  The service id
+     *
+     * @return object
+     *   The service
+     */
+    public function get($id);
 }

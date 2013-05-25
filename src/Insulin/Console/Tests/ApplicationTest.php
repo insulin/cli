@@ -50,7 +50,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
      * @param $level
      *   The level of the boot reached.
      *
-     * @return KernelInterface
+     * @return \Insulin\Console\KernelInterface
      */
     private function getKernel($level)
     {
