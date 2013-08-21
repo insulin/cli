@@ -130,8 +130,8 @@ interface KernelInterface extends \Serializable
     /**
      * Checks if debug mode is enabled.
      *
-     * @return Boolean
-     *   TRUE if debug mode is enabled, FALSE otherwise.
+     * @return bool
+     *   True if debug mode is enabled, false otherwise.
      *
      * @api
      */
@@ -160,7 +160,7 @@ interface KernelInterface extends \Serializable
     /**
      * Gets the request start time (not available if debug is disabled).
      *
-     * @return integer
+     * @return int
      *   The request start timestamp.
      *
      * @api
@@ -197,7 +197,6 @@ interface KernelInterface extends \Serializable
      * @api
      */
     public function getCharset();
-
 
     /**
      * Sets the path for the current SugarCRM instance.
