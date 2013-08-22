@@ -24,6 +24,18 @@ class Application extends BaseApplication
 
     private $kernel;
 
+    public static $logo = <<<EOF
+     ______                           ___
+    /\__  _\                         /\_ \    __
+    \/_/\ \/     ___     ____  __  __\//\ \  /\_\    ___
+       \ \ \   /' _ `\  /',__\/\ \/\ \ \ \ \ \/\ \ /' _ `\
+        \_\ \__/\ \/\ \/\__, `\ \ \_\ \ \_\ \_\ \ \/\ \/\ \
+        /\_____\ \_\ \_\/\____/\ \____/ /\____\\\ \_\ \_\ \_\
+        \/_____/\/_/\/_/\/___/  \/___/  \/____/ \/_/\/_/\/_/
+
+EOF;
+
+
     /**
      * Constructor.
      *
@@ -176,5 +188,10 @@ class Application extends BaseApplication
                 $this->add($r->newInstance());
             }
         }
+    }
+
+    public function getHelp()
+    {
+        return '<info>' . self::$logo . '</info>' . parent::getHelp();
     }
 }
