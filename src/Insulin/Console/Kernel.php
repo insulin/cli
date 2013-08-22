@@ -312,12 +312,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets the request start time (not available if debug is disabled).
-     *
-     * @return integer
-     *   The request start timestamp.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getStartTime()
     {
@@ -325,38 +320,88 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets the cache directory.
+     * Protects a list of given directories from web access.
      *
-     * @return string
-     *   The cache directory.
+     * @param string|array $dirs
+     *   A directory path or an array of directories to protect from web
+     *   access.
+     */
+    protected function protectFromWebAccess($dirs)
+    {
+        foreach ((array) $dirs as $dir) {
+            if (!file_exists($dir . '/.htaccess')) {
+                if (!is_dir($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                file_put_contents($dir . '/.htaccess', 'Deny from all');
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
      *
-     * @api
+     * The location defaults to `~/.insulin/` on *nix and
+     * `%LOCALAPPDATA%\Insulin\` on windows.
+     * When getting the home directory, we also protect it against web access,
+     * since HOME can be the www-data's user home and be web-accessible.
+     *
+     * @throws \RuntimeException if unable to get Insulin's home folder.
+     */
+    public function getHomeDir()
+    {
+        $home = getenv('INSULIN_HOME');
+        if (!$home) {
+            if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+                if (!getenv('APPDATA')) {
+                    throw new \RuntimeException(
+                        'The APPDATA or INSULIN_HOME environment variable must be set for insulin to run correctly'
+                    );
+                }
+                $home = $this->convertPath(getenv('APPDATA')) . '/Insulin';
+            } else {
+                if (!getenv('HOME')) {
+                    throw new \RuntimeException(
+                        'The HOME or INSULIN_HOME environment variable must be set for insulin to run correctly'
+                    );
+                }
+                $home = rtrim(getenv('HOME'), '/') . '/.insulin';
+            }
+        }
+
+        $this->protectFromWebAccess($home);
+
+        return $home;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getCacheDir()
     {
-        return $this->getRootDir() . '/cache/insulin';
+        $cacheDir = getenv('COMPOSER_CACHE_DIR');
+
+        if (!$cacheDir) {
+            if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+                if ($cacheDir = getenv('LOCALAPPDATA')) {
+                    $cacheDir .= '/Composer';
+                } else {
+                    $cacheDir = $this->getHomeDir() . '/cache';
+                }
+                $cacheDir = strtr($cacheDir, '\\', '/');
+
+            } else {
+                $cacheDir = $this->getHomeDir() . '/cache';
+            }
+        }
+
+        $this->protectFromWebAccess($cacheDir);
+
+        return $cacheDir;
     }
 
     /**
-     * Gets the log directory.
-     *
-     * @return string
-     *   The log directory.
-     *
-     * @api
-     */
-    public function getLogDir()
-    {
-        return $this->getRootDir() . '/logs';
-    }
-
-    /**
-     * Gets the charset of the insulin.
-     *
-     * @return string
-     *   The charset
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getCharset()
     {
@@ -438,7 +483,6 @@ class Kernel extends ContainerAware implements KernelInterface
                 'kernel.debug' => $this->debug,
                 'kernel.name' => self::NAME,
                 'kernel.cache_dir' => $this->getCacheDir(),
-                'kernel.logs_dir' => $this->getLogDir(),
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
@@ -480,14 +524,13 @@ class Kernel extends ContainerAware implements KernelInterface
     {
         $dirs = array(
             'cache' => $this->getCacheDir(),
-            'logs' => $this->getLogDir()
         );
         foreach ($dirs as $name => $dir) {
             if (!is_dir($dir)) {
                 if (false === @mkdir($dir, 0777, true)) {
                     throw new \RuntimeException(
                         sprintf(
-                            "Unable to create the %s directory (%s)\n",
+                            "Unable to create the '%s' directory (%s).",
                             $name,
                             $dir
                         )
@@ -496,7 +539,7 @@ class Kernel extends ContainerAware implements KernelInterface
             } elseif (!is_writable($dir)) {
                 throw new \RuntimeException(
                     sprintf(
-                        "Unable to write in the %s directory (%s)\n",
+                        "Unable to write in the '%s' directory (%s)",
                         $name,
                         $dir
                     )
