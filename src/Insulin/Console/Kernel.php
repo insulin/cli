@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * The Kernel is the heart of the Insulin system.
@@ -29,6 +30,12 @@ class Kernel extends ContainerAware implements KernelInterface
 {
     protected $rootDir;
     protected $debug;
+    /**
+     * True if kernel is initialized and ready to boot, false otherwise.
+     *
+     * @var bool
+     */
+    protected $initialized;
     protected $booted;
     protected $bootLevel;
     protected $startTime;
@@ -88,66 +95,50 @@ class Kernel extends ContainerAware implements KernelInterface
      *
      * @api
      */
+    public function initialize()
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        $this->initializeContainer();
+        $this->initialized = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function boot()
     {
         if (true === $this->booted) {
             return $this->bootLevel;
         }
 
-        $this->initializeContainer();
+        $this->initialize();
 
-        //$name = $this->getCommandName($input);
-        // FIXME we don't need to bootstrap to last run level if we are already running a command
-        /*
-        if (!empty($name)) {
-            // TODO search for command location
-            // TODO $phase = check level of bootstrap required for this command
-            // TODO $this->bootStrapToPhase($phase)
-            // TODO $this->registerCommands($name)
-        }
-        */
-
-        // try to bootstrap to max level and see what commands can we offer
         $bootLevel = 0;
         try {
             $levels = $this->getBootstrapLevels();
             foreach ($levels as $level) {
-                if ($this->isDebug()) {
-                    /*
-                    $output->write(
-                        sprintf("Attempting reach phase '%d'\t", $level)
-                    );
-                    */
-                }
                 $this->bootTo($level);
-                if ($this->isDebug()) {
-                    //$output->writeln(sprintf('<info>[done]</info>.'));
-                }
                 $bootLevel = $level;
             }
-            // FIXME this should catch other type of exception...
+
         } catch (\Exception $e) {
-            /*$output->writeln('<error>[error]</error>');
-            $output->writeln(
-                sprintf(
-                    "Unable to reach '%d' phase due to:\n %s",
-                    $maxPhase + 1,
-                    $e->getMessage()
-                )
+
+            $this->container->get('dispatcher')->dispatch(
+                KernelEvents::BOOT_FAILURE,
+                new KernelBootEvent($level, $e->getMessage())
             );
-            */
-            $this->booted = $bootLevel > 0;
-            $this->bootLevel = $bootLevel;
-            return $bootLevel;
-        }
-        if ($this->isDebug()) {
-            /*
-            $output->writeln(sprintf('Max phase reached "%d".', $maxPhase));
-            */
         }
 
-        $this->booted = true;
+        $this->booted = $bootLevel > 0;
         $this->bootLevel = $bootLevel;
+
+        $this->container->get('dispatcher')->dispatch(
+            KernelEvents::BOOT_SUCCESS,
+            new KernelBootEvent($this->bootLevel)
+        );
 
         return $this->bootLevel;
     }
@@ -157,13 +148,10 @@ class Kernel extends ContainerAware implements KernelInterface
         static $functions = array(
             self::BOOT_INSULIN,
             self::BOOT_SUGAR_ROOT,
-            // TODO give support to other run levels
-            /*
             self::BOOT_SUGAR_CONFIGURATION,
             self::BOOT_SUGAR_DATABASE,
             self::BOOT_SUGAR_FULL,
             self::BOOT_SUGAR_LOGIN,
-            */
         );
 
         $result = $functions;
@@ -414,7 +402,7 @@ class Kernel extends ContainerAware implements KernelInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
-        // FIXME: this should be made through configurable dependency injection
+        $this->container->set('dispatcher', new EventDispatcher());
         $this->container->set('sugar', new \Insulin\Sugar\Sugar());
 
         if (!$fresh && $this->container->has('cache_warmer')) {

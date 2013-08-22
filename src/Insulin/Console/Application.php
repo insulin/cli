@@ -48,7 +48,7 @@ class Application extends BaseApplication
     {
         $definition = parent::getDefaultInputDefinition();
         $definition->addOption(
-            new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Switches on debug mode.')
+            new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Display timing and memory usage information.')
         );
         $definition->addOption(
             new InputOption('--shell', '-s', InputOption::VALUE_NONE, 'Launch the shell.')
@@ -83,6 +83,11 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
+        $this->kernel->initialize();
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_DEBUG) {
+            $this->kernel->get('dispatcher')->addSubscriber(new DebugSubscriber($output));
+        }
+
         $this->kernel->setSugarPath($input->getParameterOption(array('--path', '-p'), null));
 
         $this->registerCommands();
@@ -95,7 +100,20 @@ class Application extends BaseApplication
             return 0;
         }
 
-        return parent::doRun($input, $output);
+        $result = parent::doRun($input, $output);
+
+        if ($this->kernel->isDebug()) {
+            $output->writeln(
+                sprintf(
+                    '<info>Memory usage: %.2fMB (peak: %.2fMB), time: %.2fs</info>',
+                    memory_get_usage() / 1024 / 1024,
+                    memory_get_peak_usage() / 1024 / 1024,
+                    microtime(true) - $this->kernel->getStartTime()
+                )
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -129,6 +147,7 @@ class Application extends BaseApplication
      *
      * * Commands are in the 'Command' sub-directory
      * * Commands extend Symfony\Component\Console\Command\Command
+     * @throws \RuntimeException if no search path for commands is available.
      */
     protected function registerCommands()
     {
@@ -137,11 +156,8 @@ class Application extends BaseApplication
         $searchPath = array();
 
         if (Kernel::BOOT_INSULIN <= $level) {
-            if ($dir = realpath($this->kernel->getRootDir() . '/Command')) {
-                $searchPath[] = $dir;
-            }
-            // TODO give support for commands on home path
-            // searchPath[] = '~/.insulin/Command';
+            $searchPath[] = $this->kernel->getRootDir() . '/Command';
+            $searchPath[] = $this->kernel->getHomeDir() . '/Command';
         }
         if (Kernel::BOOT_SUGAR_ROOT <= $level) {
             // TODO give support to commands on SugarCRM instance
