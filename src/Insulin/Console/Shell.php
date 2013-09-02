@@ -23,18 +23,7 @@ class Shell extends BaseShell
      */
     protected function getHeader()
     {
-        return <<<EOF
-<info>
-     ______                           ___
-    /\__  _\                         /\_ \    __
-    \/_/\ \/     ___     ____  __  __\//\ \  /\_\    ___
-       \ \ \   /' _ `\  /',__\/\ \/\ \ \ \ \ \/\ \ /' _ `\
-        \_\ \__/\ \/\ \/\__, `\ \ \_\ \ \_\ \_\ \ \/\ \/\ \
-        /\_____\ \_\ \_\/\____/\ \____/ /\____\\\ \_\ \_\ \_\
-        \/_____/\/_/\/_/\/___/  \/___/  \/____/ \/_/\/_/\/_/
-
-</info>
-EOF
-        .parent::getHeader();
+        $app = $this->getApplication();
+        return '<info>' . $app::$logo . '</info>' . parent::getHeader();
     }
 }
