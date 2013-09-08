@@ -20,9 +20,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SugarVersionCommandTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Application
-     */
     protected $insulin;
 
     protected function setUp()

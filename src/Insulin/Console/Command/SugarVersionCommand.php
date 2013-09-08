@@ -18,9 +18,21 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-// FIXME Insulin commands need to extend from InsulinCommand so it requires an Insulin Application
+/**
+ * This command provides information about SugarCRM version.
+ *
+ * You will be able to know which version, flavor and build number your Sugar
+ * instance is running.
+ *
+ * @fixme Insulin commands need to extend from InsulinCommand so it requires an Insulin Application
+ *
+ * @api
+ */
 class SugarVersionCommand extends Command
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -33,6 +45,9 @@ EOF
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /* @var $kernel \Insulin\Console\KernelInterface */

@@ -14,6 +14,11 @@ namespace Insulin\Console;
 
 use Symfony\Component\Console\Shell as BaseShell;
 
+/**
+ * An Insulin Shell wraps an Application to add shell capabilities to it.
+ *
+ * This extends from Symfony's Shell default abilities.
+ */
 class Shell extends BaseShell
 {
     /**
