@@ -85,6 +85,13 @@ interface KernelInterface extends \Serializable
     const BOOT_SUGAR_LOGIN = 6;
 
     /**
+     * Initializes the current kernel.
+     *
+     * @api
+     */
+    public function initialize();
+
+    /**
      * Boots the current kernel.
      *
      * @api
