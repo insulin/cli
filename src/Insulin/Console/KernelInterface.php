@@ -161,6 +161,17 @@ interface KernelInterface extends \Serializable
     public function getStartTime();
 
     /**
+     * Returns Insulin home directory for storage of cache and other related
+     * data.
+     *
+     * @return string
+     *   The Insulin home directory.
+     *
+     * @api
+     */
+    public function getHomeDir();
+
+    /**
      * Gets the cache directory.
      *
      * @return string
@@ -169,16 +180,6 @@ interface KernelInterface extends \Serializable
      * @api
      */
     public function getCacheDir();
-
-    /**
-     * Gets the log directory.
-     *
-     * @return string
-     *   The log directory.
-     *
-     * @api
-     */
-    public function getLogDir();
 
     /**
      * Gets the charset of the application.
