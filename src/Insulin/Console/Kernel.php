@@ -58,12 +58,13 @@ class Kernel extends ContainerAware implements KernelInterface
     protected $booted;
 
     /**
-     * The level of boot that we were able to reach.
+     * The level of boot that we are currently.
      *
      * @var int
+     *
      * @see KernelInterface for a list of possible `BOOT_*` levels.
      */
-    protected $bootLevel;
+    protected $bootedLevel;
 
     /**
      * @var float The start timestamp when Kernel was created.
@@ -149,36 +150,37 @@ class Kernel extends ContainerAware implements KernelInterface
     public function boot()
     {
         if (true === $this->booted) {
-            return $this->bootLevel;
+            return $this->bootedLevel;
         }
 
         $this->initialize();
 
-        $bootLevel = 0;
+        $bootedLevel = $bootLevel = 0;
         try {
             $levels = $this->getBootstrapLevels();
             foreach ($levels as $level) {
-                $this->bootTo($level);
                 $bootLevel = $level;
+                $this->bootTo($level);
+                $bootedLevel = $level;
             }
 
         } catch (\Exception $e) {
 
             $this->container->get('dispatcher')->dispatch(
                 KernelEvents::BOOT_FAILURE,
-                new KernelBootEvent($level, $e->getMessage())
+                new KernelBootEvent($bootLevel, $e->getMessage())
             );
         }
 
-        $this->booted = $bootLevel > 0;
-        $this->bootLevel = $bootLevel;
+        $this->booted = $bootedLevel > 0;
+        $this->bootedLevel = $bootedLevel;
 
         $this->container->get('dispatcher')->dispatch(
             KernelEvents::BOOT_SUCCESS,
-            new KernelBootEvent($this->bootLevel)
+            new KernelBootEvent($this->bootedLevel)
         );
 
-        return $this->bootLevel;
+        return $this->bootedLevel;
     }
 
     /**

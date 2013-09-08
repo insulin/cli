@@ -114,9 +114,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $debug = true;
 
         $kernel = new Kernel($debug);
-        $bootLevel = $kernel->boot();
+        $bootedLevel = $kernel->boot();
 
-        $this->assertSame(Kernel::BOOT_INSULIN, $bootLevel);
+        $this->assertSame(Kernel::BOOT_INSULIN, $bootedLevel);
         $this->assertTrue($kernel->isBooted());
     }
 
@@ -149,9 +149,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             $kernel->setSugarPath('/path/to/sugar');
         }
 
-        $bootLevel = $kernel->boot();
+        $bootedLevel = $kernel->boot();
 
-        $this->assertSame(Kernel::BOOT_SUGAR_ROOT, $bootLevel);
+        $this->assertSame(Kernel::BOOT_SUGAR_ROOT, $bootedLevel);
         $this->assertTrue($kernel->isBooted());
     }
 
