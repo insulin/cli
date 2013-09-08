@@ -24,7 +24,11 @@ use Symfony\Component\Finder\Finder;
 class Sugar implements SugarInterface
 {
     /**
+     * The path for the SugarCRM instance.
+     *
      * @var string
+     *
+     * @see Sugar::setPath() where this path is set.
      */
     protected $path;
 

@@ -28,18 +28,60 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class Kernel extends ContainerAware implements KernelInterface
 {
+    /**
+     * Cached Insulin root dir.
+     *
+     * @var string
+     * @see Kernel::getRootDir() where it is being cached.
+     */
     protected $rootDir;
+
+    /**
+     * True if we are running Kernel in debug not, false otherwise.
+     *
+     * @var bool
+     */
     protected $debug;
+
     /**
      * True if kernel is initialized and ready to boot, false otherwise.
      *
      * @var bool
      */
     protected $initialized;
+
+    /**
+     * True when the Kernel is booted up, false otherwise.
+     *
+     * @var bool
+     */
     protected $booted;
+
+    /**
+     * The level of boot that we were able to reach.
+     *
+     * @var int
+     * @see KernelInterface for a list of possible `BOOT_*` levels.
+     */
     protected $bootLevel;
+
+    /**
+     * @var float The start timestamp when Kernel was created.
+     */
     protected $startTime;
+
+    /**
+     * Cache classes used in this Kernel.
+     *
+     * @var array
+     */
     protected $classes;
+
+    /**
+     * The Sugar path found when booting level `BOOT_SUGAR_ROOT`.
+     *
+     * @var string
+     */
     protected $sugarPath;
 
     const NAME = 'Insulin';
@@ -52,14 +94,14 @@ class Kernel extends ContainerAware implements KernelInterface
     /**
      * Constructor.
      *
-     * @param Boolean $debug
+     * @param bool $debug
      *   Whether to enable debugging or not.
      *
      * @api
      */
     public function __construct($debug = false)
     {
-        $this->debug = (Boolean) $debug;
+        $this->debug = (bool) $debug;
         $this->booted = false;
         $this->classes = array();
 
@@ -67,11 +109,6 @@ class Kernel extends ContainerAware implements KernelInterface
             $this->startTime = microtime(true);
         }
 
-        $this->init();
-    }
-
-    public function init()
-    {
         if ($this->debug) {
             ini_set('display_errors', 1);
             error_reporting(-1);
@@ -80,6 +117,9 @@ class Kernel extends ContainerAware implements KernelInterface
         }
     }
 
+    /**
+     * Override default php clone method to reset the kernel state when cloned.
+     */
     public function __clone()
     {
         if ($this->debug) {
@@ -91,9 +131,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Boots the current kernel.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function initialize()
     {
@@ -143,9 +181,16 @@ class Kernel extends ContainerAware implements KernelInterface
         return $this->bootLevel;
     }
 
+    /**
+     * Get a list of the default bootstrap levels that we want to boot to by
+     * default.
+     *
+     * @return array
+     *   A list of standard bootstrap levels to boot.
+     */
     public function getBootstrapLevels()
     {
-        static $functions = array(
+        static $levels = array(
             self::BOOT_INSULIN,
             self::BOOT_SUGAR_ROOT,
             self::BOOT_SUGAR_CONFIGURATION,
@@ -154,11 +199,25 @@ class Kernel extends ContainerAware implements KernelInterface
             self::BOOT_SUGAR_LOGIN,
         );
 
-        $result = $functions;
-
-        return $result;
+        return $levels;
     }
 
+    /**
+     * Wrapper to boot up to a given level.
+     *
+     * This will try to boot the Kernel and will throw an Exception if unable
+     * to boot to the given level.
+     * These exceptions are thrown by the functions that we are wrapping.
+     *
+     * @param int $level
+     *   The level to boot.
+     *
+     * @return bool
+     *   True if we were able to boot up to the level provided.
+     *
+     * @throws \InvalidArgumentException when invalid level is provided.
+     * @throws \Exception based on other boot level failures.
+     */
     public function bootTo($level)
     {
         switch ($level) {
@@ -191,11 +250,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Shutdowns the kernel.
-     *
-     * This method is mainly useful when doing functional testing.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function shutdown()
     {
@@ -208,12 +263,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets the name of the kernel.
-     *
-     * @return string
-     *   The kernel name.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -221,12 +271,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets the version of the kernel.
-     *
-     * @return string
-     *   The kernel version.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getVersion()
     {
@@ -234,10 +279,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Checks if is booted.
-     *
-     * @return Boolean
-     *   TRUE if is booted, FALSE otherwise.
+     * {@inheritdoc}
      */
     public function isBooted()
     {
@@ -245,12 +287,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Checks if debug mode is enabled.
-     *
-     * @return Boolean
-     *   TRUE if debug mode is enabled, FALSE otherwise.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function isDebug()
     {
@@ -258,12 +295,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets the insulin root dir.
-     *
-     * @return string
-     *   The insulin root dir.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getRootDir()
     {
@@ -276,12 +308,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets the current container.
-     *
-     * @return \Symfony\Component\DependencyInjection\ContainerInterface
-     *   A ContainerInterface instance.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getContainer()
     {
@@ -461,7 +488,7 @@ class Kernel extends ContainerAware implements KernelInterface
      * Returns the kernel parameters.
      *
      * @return array
-     *   An array of kernel parameters
+     *   An array of kernel parameters.
      */
     protected function getKernelParameters()
     {
@@ -484,7 +511,7 @@ class Kernel extends ContainerAware implements KernelInterface
      * Only the parameters starting with "INSULIN__" are considered.
      *
      * @return array
-     *   An array of parameters
+     *   An array of parameters.
      */
     protected function getEnvParameters()
     {
@@ -616,11 +643,24 @@ class Kernel extends ContainerAware implements KernelInterface
         return $output;
     }
 
+    /**
+     * Provide a way to serialize a kernel. Currently save the debug status.
+     *
+     * @return string
+     *   The serialized Kernel.
+     */
     public function serialize()
     {
         return serialize(array($this->debug));
     }
 
+    /**
+     * When restoring a Kernel use the serialized state to create a new
+     * instance.
+     *
+     * @param string $data
+     *   The serialized data.
+     */
     public function unserialize($data)
     {
         list($debug) = unserialize($data);
@@ -671,18 +711,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Sets the path for the current SugarCRM instance.
-     *
-     * @param string $path
-     *   Path to a SugarCRM instance root directory.
-     *
-     * @throws \InvalidArgumentException if invalid $prop given.
-     * @throws \RuntimeException if unsupported property requested for current SugarCRM instance.
-     *
-     * @return Kernel
-     *   Kernel instance.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function setSugarPath($path)
     {
@@ -691,15 +720,7 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Gets a service by id.
-     *
-     * @param string $id
-     *  Service id.
-     *
-     * @return object
-     *   Service instance.
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function get($id)
     {

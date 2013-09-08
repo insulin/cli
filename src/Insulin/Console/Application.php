@@ -18,10 +18,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * An Insulin application is based on Symfony's Console Application.
+ *
+ * @api
+ */
 class Application extends BaseApplication
 {
-    protected $reflected;
-
+    /**
+     * @var KernelInterface This applications' kernel.
+     */
     private $kernel;
 
     public static $logo = <<<EOF
@@ -51,7 +57,8 @@ EOF;
     /**
      * Gets the default input definition.
      *
-     * This overrides the parent default commands to allow a debug and pipe option.
+     * This overrides the parent default commands to allow debug, shell and
+     * path options.
      *
      * @return \Symfony\Component\Console\Input\InputDefinition
      *   An InputDefinition instance.
@@ -88,10 +95,13 @@ EOF;
     /**
      * Runs the current application.
      *
-     * @param InputInterface $input  An Input instance
-     * @param OutputInterface $output An Output instance
+     * @param InputInterface $input
+     *   An Input instance.
+     * @param OutputInterface $output
+     *   An Output instance.
      *
-     * @return integer 0 if everything went fine, or an error code
+     * @return int
+     *   Returns 0 if everything went fine, or an error code.
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
@@ -132,7 +142,7 @@ EOF;
      * Gets the Insulin namespace.
      *
      * @return string
-     *   The Insulin namespace
+     *   The Insulin namespace.
      *
      * @api
      */
@@ -157,8 +167,9 @@ EOF;
      *
      * Insulin commands follow the conventions:
      *
-     * * Commands are in the 'Command' sub-directory
-     * * Commands extend Symfony\Component\Console\Command\Command
+     * - Commands are in the 'Command' sub-directory
+     * - Commands extend Symfony\Component\Console\Command\Command
+     *
      * @throws \RuntimeException if no search path for commands is available.
      */
     protected function registerCommands()

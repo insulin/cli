@@ -12,6 +12,15 @@
 
 namespace Insulin\Sugar;
 
+/**
+ * Interface for Sugar API being used by Insulin.
+ *
+ * This will allow the Sugar API and Insulin to work independently and support
+ * several versions as long as these methods are available on their
+ * implementations.
+ * Later we might release this interface and their implementations to be used
+ * by other project's that might want to integrate with SugarCRM using PHP.
+ */
 interface SugarInterface
 {
     /**

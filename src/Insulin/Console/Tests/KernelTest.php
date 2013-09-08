@@ -17,6 +17,9 @@ use Insulin\Console\Kernel;
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * We should be able to create a new Insulin Kernel.
+     */
     public function testConstructor()
     {
         $debug = true;
@@ -28,6 +31,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($kernel->getContainer());
     }
 
+    /**
+     * If we are cloning a new Kernel, confirm that is being reset.
+     */
     public function testClone()
     {
         $debug = true;
@@ -41,18 +47,29 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($clone->getContainer());
     }
 
+    /**
+     * When creating a new kernel we should always have a root dir for Insulin.
+     */
     public function testGetRootDir()
     {
         $kernel = new Kernel();
         $this->assertNotEmpty($kernel->getRootDir());
     }
 
+    /**
+     * New Kernel by default should return `UTF-8` charset.
+     */
     public function testGetCharset()
     {
         $kernel = new Kernel();
         $this->assertSame('UTF-8', $kernel->getCharset());
     }
 
+    /**
+     * When booting the Kernel twice, it should only boot once.
+     *
+     * @group performance
+     */
     public function testPerformanceBoot()
     {
         $kernel = $this->getMock(
@@ -69,6 +86,8 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Confirm that boot fails as expected when using several invalid params.
+     *
      * @dataProvider providerBootToFailure
      */
     public function testBootToFailure($level, $expectedResult, $expectedException = null)
@@ -102,6 +121,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Confirm that we can boot up to Sugar Root level with and without a given
+     * path.
+     *
      * @dataProvider providerBootSugarRootLevel
      */
     public function testBootSugarRootLevel($withPath)
@@ -133,6 +155,14 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
+    /**
+     * Provider for testBootSugarRootLevel.
+     *
+     * @see KernelTest::testBootSugarRootLevel()
+     *
+     * @return array
+     *   True if we want to boot sugar root level, false otherwise.
+     */
     public function providerBootSugarRootLevel()
     {
         return array(
@@ -141,6 +171,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Confirm that we can shutdown the Kernel after a valid boot.
+     */
     public function testShutdownsWhenBooted()
     {
         $kernel = $this->getMock(

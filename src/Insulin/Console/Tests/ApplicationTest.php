@@ -18,6 +18,10 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * Confirm that all the core commands with bootstrap level `BOOT_INSULIN`
+     * will be available by default.
+     */
     public function testCoreCommandsAvailableWithBootInsulin()
     {
         $kernel = $this->getKernel(Kernel::BOOT_INSULIN);
@@ -31,6 +35,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         // FIXME add core commands like download SugarCRM ce?
     }
 
+    /**
+     * Confirm that all the core commands with bootstrap level
+     * `BOOT_SUGAR_ROOT` will be available by default.
+     */
     public function testCoreCommandsAvailableWithBootSugarConfiguration()
     {
         $kernel = $this->getKernel(Kernel::BOOT_SUGAR_ROOT);
