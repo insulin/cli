@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "cf8658f3471d692c5d7816e97f7bcecd",
+    "hash": "f5676cac17158432aa42898104f260cb",
     "packages": [
         {
             "name": "symfony/config",
@@ -60,12 +60,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "db78f8ff7fc9e28d25ff9a0bf6ddf9f0e35fbbe3"
+                "reference": "6db369933dae13262c7c8c9a265d51723be1d2e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/db78f8ff7fc9e28d25ff9a0bf6ddf9f0e35fbbe3",
-                "reference": "db78f8ff7fc9e28d25ff9a0bf6ddf9f0e35fbbe3",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/6db369933dae13262c7c8c9a265d51723be1d2e3",
+                "reference": "6db369933dae13262c7c8c9a265d51723be1d2e3",
                 "shasum": ""
             },
             "require": {
@@ -104,7 +104,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2013-08-17 16:34:49"
+            "time": "2013-09-06 18:20:34"
         },
         {
             "name": "symfony/dependency-injection",
@@ -113,12 +113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/DependencyInjection.git",
-                "reference": "3678aa969e5bfeb8515a1f3047c63e8104723f5c"
+                "reference": "586ea011b73be5817e984b56b744b1acbd2dbacf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/3678aa969e5bfeb8515a1f3047c63e8104723f5c",
-                "reference": "3678aa969e5bfeb8515a1f3047c63e8104723f5c",
+                "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/586ea011b73be5817e984b56b744b1acbd2dbacf",
+                "reference": "586ea011b73be5817e984b56b744b1acbd2dbacf",
                 "shasum": ""
             },
             "require": {
@@ -160,7 +160,61 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "http://symfony.com",
-            "time": "2013-07-25 17:13:25"
+            "time": "2013-09-03 10:21:15"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "v2.3.0",
+            "target-dir": "Symfony/Component/EventDispatcher",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/EventDispatcher.git",
+                "reference": "2d84c66c090ed676f9ac60a46b9366d4dd80a523"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/2d84c66c090ed676f9ac60a46b9366d4dd80a523",
+                "reference": "2d84c66c090ed676f9ac60a46b9366d4dd80a523",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/dependency-injection": "~2.0"
+            },
+            "suggest": {
+                "symfony/dependency-injection": "",
+                "symfony/http-kernel": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\EventDispatcher\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony EventDispatcher Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-05-13 14:36:40"
         },
         {
             "name": "symfony/filesystem",
@@ -311,12 +365,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Intl.git",
-                "reference": "f1f79e70df1639a57c3881f0e55b35ec163d2b1e"
+                "reference": "e62a0479f1e86df5a4301b7ff3c5709a0d95355b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Intl/zipball/f1f79e70df1639a57c3881f0e55b35ec163d2b1e",
-                "reference": "f1f79e70df1639a57c3881f0e55b35ec163d2b1e",
+                "url": "https://api.github.com/repos/symfony/Intl/zipball/e62a0479f1e86df5a4301b7ff3c5709a0d95355b",
+                "reference": "e62a0479f1e86df5a4301b7ff3c5709a0d95355b",
                 "shasum": ""
             },
             "require": {
@@ -379,7 +433,7 @@
                 "l10n",
                 "localization"
             ],
-            "time": "2013-08-08 12:02:55"
+            "time": "2013-08-29 06:54:01"
         },
         {
             "name": "symfony/locale",
@@ -436,12 +490,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Process.git",
-                "reference": "a49d145045efb086592c2df48490a14d6d9e9874"
+                "reference": "501b64b92040c1331339d8a4efe0e06f81dd889e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Process/zipball/a49d145045efb086592c2df48490a14d6d9e9874",
-                "reference": "a49d145045efb086592c2df48490a14d6d9e9874",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/501b64b92040c1331339d8a4efe0e06f81dd889e",
+                "reference": "501b64b92040c1331339d8a4efe0e06f81dd889e",
                 "shasum": ""
             },
             "require": {
@@ -474,7 +528,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "http://symfony.com",
-            "time": "2013-08-21 07:58:38"
+            "time": "2013-09-07 16:30:19"
         }
     ],
     "packages-dev": [
