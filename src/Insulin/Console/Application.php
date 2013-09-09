@@ -187,7 +187,7 @@ EOF;
             // $searchPath[] = $this->kernel->get('sugar')->getPath() . '/custom/Insulin';
         }
 
-        // TODO make the other phase commands retrieval
+        $searchPath = array_filter($searchPath, 'is_dir');
 
         if (empty($searchPath)) {
             throw new \RuntimeException(
