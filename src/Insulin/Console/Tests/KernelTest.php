@@ -77,7 +77,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array('getBootstrapLevels')
         );
         $kernel->expects($this->once())->method('getBootstrapLevels')->will(
-            $this->returnValue(array())
+            $this->returnValue(array('1'))
         );
 
         /* @var $kernel \Insulin\Console\KernelInterface */

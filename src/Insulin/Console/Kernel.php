@@ -149,7 +149,7 @@ class Kernel extends ContainerAware implements KernelInterface
      */
     public function boot()
     {
-        if (true === $this->booted) {
+        if ($this->booted) {
             return $this->bootedLevel;
         }
 
