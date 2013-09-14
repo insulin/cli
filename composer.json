@@ -39,5 +39,10 @@
         "symfony/locale": "2.3.*",
         "symfony/process": "2.3.*"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0-dev"
+        }
+    }
 }
