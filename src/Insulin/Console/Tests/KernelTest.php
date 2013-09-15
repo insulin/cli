@@ -109,6 +109,29 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Confirm that boot fails when not reaching first level.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage Unit test for boot failure
+     */
+    public function testBootFailure()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('getBootstrapLevels', 'bootTo')
+        );
+
+        $kernel->expects($this->once())->method('getBootstrapLevels')->will(
+            $this->returnValue(array(1))
+        );
+        $kernel->expects($this->once())->method('bootTo')->with(1)->will(
+            $this->throwException(new \Exception('Unit test for boot failure'))
+        );
+
+        $kernel->boot();
+    }
+
     public function testBootInsulinLevel()
     {
         $debug = true;
