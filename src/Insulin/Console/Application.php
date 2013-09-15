@@ -106,6 +106,9 @@ EOF;
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         $this->kernel->initialize();
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
+            $this->kernel->get('dispatcher')->addSubscriber(new VerboseSubscriber($output));
+        }
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_DEBUG) {
             $this->kernel->get('dispatcher')->addSubscriber(new DebugSubscriber($output));
         }
@@ -174,15 +177,15 @@ EOF;
      */
     protected function registerCommands()
     {
-        $level = $this->kernel->boot();
+        $this->kernel->boot();
 
         $searchPath = array();
 
-        if (Kernel::BOOT_INSULIN <= $level) {
+        if (Kernel::BOOT_INSULIN <= $this->kernel->getBootedLevel()) {
             $searchPath[] = $this->kernel->getRootDir() . '/Command';
             $searchPath[] = $this->kernel->getHomeDir() . '/Command';
         }
-        if (Kernel::BOOT_SUGAR_ROOT <= $level) {
+        if (Kernel::BOOT_SUGAR_ROOT <= $this->kernel->getBootedLevel()) {
             // TODO give support to commands on SugarCRM instance
             // $searchPath[] = $this->kernel->get('sugar')->getPath() . '/custom/Insulin';
         }
@@ -193,7 +196,7 @@ EOF;
             throw new \RuntimeException(
                 sprintf(
                     'No search path for commands available for run level "%s".',
-                    $level
+                    $this->kernel->getBootedLevel()
                 )
             );
         }
