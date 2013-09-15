@@ -155,24 +155,29 @@ class Kernel extends ContainerAware implements KernelInterface
 
         $this->initialize();
 
-        $bootedLevel = $bootLevel = 0;
+        $bootedLevel = 0;
+        $previousException = null;
         try {
             $levels = $this->getBootstrapLevels();
             foreach ($levels as $level) {
-                $bootLevel = $level;
                 $this->bootTo($level);
                 $bootedLevel = $level;
             }
 
         } catch (\Exception $e) {
-
-            $this->container->get('dispatcher')->dispatch(
-                KernelEvents::BOOT_FAILURE,
-                new KernelBootEvent($bootLevel, $e->getMessage())
-            );
+            $previousException = $e;
         }
 
         $this->booted = $bootedLevel > 0;
+
+        if (!$this->booted) {
+            $this->container->get('dispatcher')->dispatch(
+                KernelEvents::BOOT_FAILURE,
+                new KernelBootEvent($bootedLevel, $previousException)
+            );
+            throw $previousException;
+        }
+
         $this->bootedLevel = $bootedLevel;
 
         $this->container->get('dispatcher')->dispatch(
