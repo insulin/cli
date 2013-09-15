@@ -212,6 +212,16 @@ interface KernelInterface extends \Serializable
     public function getCharset();
 
     /**
+     * Gets the path for the current SugarCRM instance.
+     *
+     * @return string
+     *   Path to a SugarCRM instance root directory.
+     *
+     * @api
+     */
+    public function getSugarPath();
+
+    /**
      * Sets the path for the current SugarCRM instance.
      *
      * @param string $path

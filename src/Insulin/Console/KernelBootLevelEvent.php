@@ -15,7 +15,7 @@ namespace Insulin\Console;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * This Event is triggered by the Kernel while doing a full boot.
+ * This Event is triggered by the Kernel while booting to a certain level.
  *
  * @see KernelEvents for a list of possible event names that can trigger this
  *   event.
@@ -23,8 +23,15 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @api
  */
-class KernelBootEvent extends Event
+class KernelBootLevelEvent extends Event
 {
+    /**
+     * The Boot level that triggered this event.
+     *
+     * @var int
+     */
+    protected $level;
+
     /**
      * The Kernel instance that triggered this event.
      *
@@ -33,7 +40,7 @@ class KernelBootEvent extends Event
     protected $kernel;
 
     /**
-     * The Exception thrown when there is a full boot failure.
+     * The Exception instance when there is a boot level failure.
      *
      * @var \Exception
      */
@@ -43,22 +50,36 @@ class KernelBootEvent extends Event
      * Creates a new instance with the boot level and the error message if an
      * error occurred.
      *
+     * @param int $level
+     *   The Kernel's boot level.
      * @param KernelInterface $kernel
      *   The Kernel's.
      * @param \Exception $exception
-     *   The Exception thrown when there is a full boot failure.
+     *   The Exception instance that is thrown when there is a boot level
+     *   failure.
      */
-    public function __construct(KernelInterface $kernel, \Exception $exception = null)
+    public function __construct($level, KernelInterface $kernel, \Exception $exception = null)
     {
+        $this->level = $level;
         $this->kernel = $kernel;
         $this->exception = $exception;
+    }
+
+    /**
+     * Gets the Kernel's boot level that triggered this event.
+     *
+     * @return int
+     *   The Kernel's boot level defined on this event.
+     */
+    public function getLevel()
+    {
+        return $this->level;
     }
 
     /**
      * Gets the Kernel instance that triggered this event.
      *
      * @return KernelInterface
-     *   The Kernel instance that triggered this event.
      */
     public function getKernel()
     {
@@ -66,7 +87,8 @@ class KernelBootEvent extends Event
     }
 
     /**
-     * Gets the exception instance when there is a full boot failure.
+     * Gets the exception instance that is thrown when there is a boot level
+     * failure.
      *
      * @return \Exception
      *   The Exception instance or null if no failure occurred.
