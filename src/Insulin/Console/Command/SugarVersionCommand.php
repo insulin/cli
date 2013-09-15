@@ -52,8 +52,9 @@ EOF
     {
         /* @var $kernel \Insulin\Console\KernelInterface */
         $kernel = $this->getApplication()->getKernel();
+        $kernel->boot();
 
-        if ($kernel->boot() < $kernel::BOOT_SUGAR_ROOT) {
+        if ($kernel->getBootedLevel() < $kernel::BOOT_SUGAR_ROOT) {
             // FIXME change this to a common exception to be used by all commands
             throw new \Exception('Cannot execute command, no SugarCRM instance found.');
         }

@@ -15,22 +15,19 @@ namespace Insulin\Console;
 final class KernelEvents
 {
     /**
-     * The `kernel.boot_success` event is thrown each time the boot reaches a
-     * certain level with success.
+     * The `kernel.boot_success` event is triggered when full boot ends
+     * successfully.
      *
-     * The event listener receives an
-     * Insulin\Console\KernelBootEvent instance.
+     * The event listener receives an Insulin\Console\KernelBootEvent instance.
      *
      * @var string
      */
     const BOOT_SUCCESS = 'kernel.boot_success';
 
     /**
-     * The `kernel.boot_failure` event is thrown each time the boot fails on a
-     * certain level.
+     * The `kernel.boot_failure` event is triggered when full boot fails.
      *
-     * The event listener receives an
-     * Insulin\Console\KernelBootEvent instance.
+     * The event listener receives an Insulin\Console\KernelBootEvent instance.
      *
      * @var string
      */

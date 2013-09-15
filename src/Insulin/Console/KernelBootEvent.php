@@ -15,9 +15,9 @@ namespace Insulin\Console;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * KernelBootEvent contains the Kernel Boot event data.
+ * This Event is triggered by the Kernel while doing a full boot.
  *
- * @see KernelEvents for a list of possible event names that trigger this
+ * @see KernelEvents for a list of possible event names that can trigger this
  *   event.
  * @see Kernel::boot to see how this event is triggered.
  *
@@ -26,53 +26,53 @@ use Symfony\Component\EventDispatcher\Event;
 class KernelBootEvent extends Event
 {
     /**
-     * The Boot level that triggered this event.
+     * The Kernel instance that triggered this event.
      *
-     * @var int
+     * @var KernelInterface
      */
-    protected $level;
+    protected $kernel;
 
     /**
-     * The error message from the exception when a failure happens.
+     * The Exception thrown when there is a full boot failure.
      *
-     * @var string
+     * @var \Exception
      */
-    protected $error;
+    protected $exception;
 
     /**
      * Creates a new instance with the boot level and the error message if an
      * error occurred.
      *
-     * @param int $level
-     *   The Kernel's boot level.
-     * @param string $error
-     *   The Kernel's error message if failure (defaults to empty).
+     * @param KernelInterface $kernel
+     *   The Kernel's.
+     * @param \Exception $exception
+     *   The Exception thrown when there is a full boot failure.
      */
-    public function __construct($level, $error = '')
+    public function __construct(KernelInterface $kernel, \Exception $exception = null)
     {
-        $this->level = $level;
-        $this->error = $error;
+        $this->kernel = $kernel;
+        $this->exception = $exception;
     }
 
     /**
-     * Gets the Kernel's boot level that triggered this event.
+     * Gets the Kernel instance that triggered this event.
      *
-     * @return int
-     *   The Kernel's boot level defined on this event.
+     * @return KernelInterface
+     *   The Kernel instance that triggered this event.
      */
-    public function getLevel()
+    public function getKernel()
     {
-        return $this->level;
+        return $this->kernel;
     }
 
     /**
-     * Gets the error message explaining why the Kernel failed to boot.
+     * Gets the exception instance when there is a full boot failure.
      *
-     * @return int
-     *   The Kernel's error message if boot failed.
+     * @return \Exception
+     *   The Exception instance or null if no failure occurred.
      */
-    public function getError()
+    public function getException()
     {
-        return $this->error;
+        return $this->exception;
     }
 }

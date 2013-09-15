@@ -24,14 +24,7 @@ class DebugSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::BOOT_SUCCESS => array(
-                array('onKernelBootSuccess'),
-            ),
-            KernelEvents::BOOT_FAILURE => array(
-                array('onKernelBootFailure'),
-            ),
-        );
+        return array();
     }
 
     /**
@@ -44,35 +37,5 @@ class DebugSubscriber implements EventSubscriberInterface
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
-    }
-
-    /**
-     * Listen for Kernel boot success levels.
-     *
-     * @param KernelBootEvent $event
-     *   The event that contains the level that was booted successfully.
-     */
-    public function onKernelBootSuccess(KernelBootEvent $event)
-    {
-        $this->output->writeln(
-            sprintf("Max phase reached '%d'.", $event->getLevel())
-        );
-    }
-
-    /**
-     * Listen for possible Kernel boot failures.
-     *
-     * @param KernelBootEvent $event
-     *   The event that contains the boot failure.
-     */
-    public function onKernelBootFailure(KernelBootEvent $event)
-    {
-        $this->output->writeln(
-            sprintf(
-                "Unable to reach '%d' phase due to: %s",
-                $event->getLevel(),
-                $event->getError()
-            )
-        );
     }
 }

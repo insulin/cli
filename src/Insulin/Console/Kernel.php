@@ -173,7 +173,7 @@ class Kernel extends ContainerAware implements KernelInterface
         if (!$this->booted) {
             $this->container->get('dispatcher')->dispatch(
                 KernelEvents::BOOT_FAILURE,
-                new KernelBootEvent($bootedLevel, $previousException)
+                new KernelBootEvent($this, $previousException)
             );
             throw $previousException;
         }
@@ -182,7 +182,7 @@ class Kernel extends ContainerAware implements KernelInterface
 
         $this->container->get('dispatcher')->dispatch(
             KernelEvents::BOOT_SUCCESS,
-            new KernelBootEvent($this->bootedLevel)
+            new KernelBootEvent($this)
         );
     }
 
