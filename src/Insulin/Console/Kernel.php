@@ -154,6 +154,7 @@ class Kernel extends ContainerAware implements KernelInterface
         }
 
         $this->initialize();
+        $this->container->get('dispatcher')->addSubscriber(new BootSubscriber());
 
         $bootedLevel = 0;
         $previousException = null;
@@ -223,43 +224,37 @@ class Kernel extends ContainerAware implements KernelInterface
      * These exceptions are thrown by the functions that we are wrapping.
      *
      * @param int $level
-     *   The level to boot.
+     *   The level to boot to.
      *
-     * @return bool
-     *   True if we were able to boot up to the level provided.
-     *
-     * @throws \InvalidArgumentException when invalid level is provided.
-     * @throws \Exception based on other boot level failures.
+     * FIXME: create KernelBootLevelException
+     * @throws \Exception on boot failure for given level.
      */
-    public function bootTo($level)
+    protected function bootTo($level)
     {
-        switch ($level) {
-            case self::BOOT_INSULIN:
-                return true;
-                break;
-            case self::BOOT_SUGAR_ROOT:
-                $path = $this->sugarPath;
-                if (!empty($path)) {
-                    $this->get('sugar')->setPath($path);
-                } else {
-                    $this->get('sugar')->setPath($this->getCwd(), true);
-                }
+        $this->container->get('dispatcher')->dispatch(
+            KernelEvents::BOOT_LEVEL_BEFORE,
+            new KernelBootLevelEvent($level, $this)
+        );
 
-                if (!defined('sugarEntry')) {
-                    define('sugarEntry', true);
-                }
-                return true;
-                break;
-            // TODO give support to other run levels
-            default:
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Unknown "%s" phase given.',
-                        $level
-                    )
-                );
-                break;
+        try {
+            $this->container->get('dispatcher')->dispatch(
+                KernelEvents::BOOT_LEVEL,
+                new KernelBootLevelEvent($level, $this)
+            );
+
+        } catch (\Exception $e) {
+            $this->container->get('dispatcher')->dispatch(
+                KernelEvents::BOOT_LEVEL_FAILURE,
+                new KernelBootLevelEvent($level, $this, $e)
+            );
+
+            throw $e;
         }
+
+        $this->container->get('dispatcher')->dispatch(
+            KernelEvents::BOOT_LEVEL_SUCCESS,
+            new KernelBootLevelEvent($level, $this)
+        );
     }
 
     /**
@@ -721,6 +716,14 @@ class Kernel extends ContainerAware implements KernelInterface
         $path = preg_replace('/^\/cygdrive\/([A-Za-z])(.*)$/', '\1:\2', $path);
 
         return $path;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSugarPath()
+    {
+        return $this->sugarPath;
     }
 
     /**

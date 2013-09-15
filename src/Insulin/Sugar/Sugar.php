@@ -239,4 +239,14 @@ class Sugar implements SugarInterface
 
         return $info[$property];
     }
+
+    /**
+     * FIXME this will need to be moved to a SugarWrapper that isn't PSR-2 valid
+     */
+    public function init()
+    {
+        if (!defined('sugarEntry')) {
+            define('sugarEntry', true);
+        }
+    }
 }

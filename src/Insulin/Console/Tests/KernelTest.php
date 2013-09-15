@@ -74,7 +74,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = $this->getMock(
             'Insulin\Console\Kernel',
-            array('getBootstrapLevels')
+            array('getBootstrapLevels', 'bootTo')
         );
         $kernel->expects($this->once())->method('getBootstrapLevels')->will(
             $this->returnValue(array('1'))
@@ -83,30 +83,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         /* @var $kernel \Insulin\Console\KernelInterface */
         $kernel->boot();
         $kernel->boot();
-    }
-
-    /**
-     * Confirm that boot fails as expected when using several invalid params.
-     *
-     * @dataProvider providerBootToFailure
-     */
-    public function testBootToFailure($level, $expectedResult, $expectedException = null)
-    {
-        if (!empty($expectedException)) {
-            $this->setExpectedException($expectedException);
-        }
-
-        $kernel = new Kernel();
-
-        $this->assertEquals($expectedResult, $kernel->bootTo($level));
-    }
-
-    public function providerBootToFailure()
-    {
-        return array(
-            array(null, false, 'InvalidArgumentException'),
-            array(-1, false, 'InvalidArgumentException'),
-        );
     }
 
     /**
@@ -130,68 +106,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         );
 
         $kernel->boot();
-    }
-
-    public function testBootInsulinLevel()
-    {
-        $debug = true;
-
-        $kernel = new Kernel($debug);
-        $kernel->boot();
-
-        $this->assertSame(Kernel::BOOT_INSULIN, $kernel->getBootedLevel());
-        $this->assertTrue($kernel->isBooted());
-    }
-
-    /**
-     * Confirm that we can boot up to Sugar Root level with and without a given
-     * path.
-     *
-     * @dataProvider providerBootSugarRootLevel
-     */
-    public function testBootSugarRootLevel($withPath)
-    {
-        $sugar = $this->getMock(
-            'Insulin\Sugar\Sugar',
-            array('setPath')
-        );
-        $sugar->expects($this->once())->method('setPath')->will(
-            $this->returnValue($sugar)
-        );
-
-        $kernel = $this->getMock(
-            'Insulin\Console\Kernel',
-            array('get')
-        );
-        $kernel->expects($this->once())->method('get')->with('sugar')->will(
-            $this->returnValue($sugar)
-        );
-
-        /* @var $kernel \Insulin\Console\Kernel */
-        if ($withPath) {
-            $kernel->setSugarPath('/path/to/sugar');
-        }
-
-        $kernel->boot();
-
-        $this->assertSame(Kernel::BOOT_SUGAR_ROOT, $kernel->getBootedLevel());
-        $this->assertTrue($kernel->isBooted());
-    }
-
-    /**
-     * Provider for testBootSugarRootLevel.
-     *
-     * @see KernelTest::testBootSugarRootLevel()
-     *
-     * @return array
-     *   True if we want to boot sugar root level, false otherwise.
-     */
-    public function providerBootSugarRootLevel()
-    {
-        return array(
-            array(true),
-            array(false),
-        );
     }
 
     /**
