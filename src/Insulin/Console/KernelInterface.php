@@ -99,6 +99,19 @@ interface KernelInterface extends \Serializable
     public function boot();
 
     /**
+     * Returns the maximum level reached after booting with success, false
+     * otherwise.
+     *
+     * All levels available are defined as BOOT_* constants on KernelInterface.
+     *
+     * @return bool|int
+     *   The current boot level of the kernel.
+     *
+     * @api
+     */
+    public function getBootedLevel();
+
+    /**
      * Shutdowns the kernel.
      *
      * This method is mainly useful when doing functional testing.

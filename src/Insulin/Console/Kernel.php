@@ -150,7 +150,7 @@ class Kernel extends ContainerAware implements KernelInterface
     public function boot()
     {
         if ($this->booted) {
-            return $this->bootedLevel;
+            return;
         }
 
         $this->initialize();
@@ -179,8 +179,14 @@ class Kernel extends ContainerAware implements KernelInterface
             KernelEvents::BOOT_SUCCESS,
             new KernelBootEvent($this->bootedLevel)
         );
+    }
 
-        return $this->bootedLevel;
+    /**
+     * {@inheritdoc}
+     */
+    public function getBootedLevel()
+    {
+        return $this->isBooted() ? $this->bootedLevel : false;
     }
 
     /**
