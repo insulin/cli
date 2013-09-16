@@ -75,19 +75,6 @@ EOF
         }
         */
 
-
-        // TODO translations
-        /*
-        $translator = $this->getContainer()->get('translator');
-        $text = $translator->trans(
-            "Sugar %flavor% %version% build %build%",
-            array(
-                '%flavor%' => $flavor,
-                '%version%' => $version,
-                '%build%' => $build
-            )
-        );
-        */
         $text = sprintf(
             "SugarCRM %s %s build %s",
             $flavor,

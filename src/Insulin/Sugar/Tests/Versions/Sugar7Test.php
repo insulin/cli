@@ -10,14 +10,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Insulin\Sugar\Exception;
+namespace Insulin\Sugar\Versions\Tests;
 
-/**
- * Thrown when a specific path does not contain a valid SugarCRM instance root
- * directory.
- *
- * @api
- */
-class RootNotFoundException extends Exception
+use Insulin\Sugar\Tests\SugarTest;
+
+class Sugar7Test extends SugarTest
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected static $version = '7';
 }

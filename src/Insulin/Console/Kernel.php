@@ -483,7 +483,7 @@ class Kernel extends ContainerAware implements KernelInterface
         $this->container->set('kernel', $this);
 
         $this->container->set('dispatcher', new EventDispatcher());
-        $this->container->set('sugar', new \Insulin\Sugar\Sugar());
+        $this->container->set('sugar_manager', new \Insulin\Sugar\Manager());
 
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp(
@@ -690,7 +690,7 @@ class Kernel extends ContainerAware implements KernelInterface
         //}
         // We use PWD if available because getcwd() resolves symlinks, which
         // could take us outside of the SugarCRM root, making it impossible to
-        // find.$_SERVER['PWD'] isn't set on windows and generates a Notice.
+        // find. $_SERVER['PWD'] isn't set on windows and generates a Notice.
         $path = isset($_SERVER['PWD']) ? $_SERVER['PWD'] : '';
         if (empty($path)) {
             $path = getcwd();

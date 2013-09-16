@@ -81,7 +81,8 @@ class SugarVersionCommandTest extends \PHPUnit_Framework_TestCase
     {
         $sugar = $this->getMock(
             'Insulin\Sugar\Sugar',
-            array('getInfo')
+            array('getInfo'),
+            array('')
         );
         $map = array(
             array('flavor', false, 'ENT'),

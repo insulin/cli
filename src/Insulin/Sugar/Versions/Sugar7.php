@@ -10,14 +10,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Insulin\Sugar\Exception;
+namespace Insulin\Sugar\Versions;
+
+use Insulin\Sugar\Sugar;
 
 /**
- * Thrown when a specific path does not contain a valid SugarCRM instance root
- * directory.
+ * Takes care of SugarCRM 7.x special use cases of Sugar proxy.
  *
- * @api
+ * This class abstracts the way how one can interact with a SugarCRM instance
+ * regardless of it's version.
  */
-class RootNotFoundException extends Exception
+class Sugar7 extends Sugar
 {
 }
