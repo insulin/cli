@@ -39,6 +39,9 @@
         "symfony/locale": "2.3.*",
         "symfony/process": "2.3.*"
     },
+    "require-dev": {
+        "satooshi/php-coveralls": "dev-master"
+    },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
