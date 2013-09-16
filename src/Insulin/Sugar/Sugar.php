@@ -34,16 +34,6 @@ abstract class Sugar implements SugarInterface
     }
 
     /**
-     * Initializes this Sugar instance to be ready to call Sugar code.
-     */
-    public function init()
-    {
-        if (!defined('sugarEntry')) {
-            define('sugarEntry', true);
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getPath()
@@ -52,20 +42,7 @@ abstract class Sugar implements SugarInterface
     }
 
     /**
-     * Gets SugarCRM full version information.
-     *
-     * @param string $property
-     *   The property to retrieve, can be 'version', 'build' or 'flavor'.
-     * @param bool $refresh
-     *   True if we want to re-read the file.
-     *
-     * @return mixed
-     *   SugarCRM version value according to the supplied property.
-     *
-     * @throws \InvalidArgumentException
-     *   If unknown property supplied.
-     * @throws Exception\RuntimeException
-     *   If the supplied property isn't found on this SugarCRM instance.
+     * {@inheritdoc}
      */
     public function getInfo($property = 'version', $refresh = false)
     {
@@ -103,5 +80,147 @@ abstract class Sugar implements SugarInterface
         }
 
         return $info[$property];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function bootRoot()
+    {
+        defined('sugarEntry') || define('sugarEntry', true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function bootConfig($refresh = false)
+    {
+        static $config = null;
+
+        if ($config !== null && !$refresh) {
+            return $config;
+        }
+
+        $configFile = $this->getPath() . '/config.php';
+        if (!is_file($configFile)) {
+            throw new \RuntimeException('Cannot boot configuration: config.php not found.');
+        }
+
+        global $sugar_config;
+        include $configFile;
+
+        $override = $this->getPath() . '/config_override.php';
+        if (is_file($override)) {
+            include $override;
+        }
+
+        $config = $sugar_config;
+
+        return $config;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function bootDatabase()
+    {
+        $config = $this->bootConfig();
+
+        if (!isset($config['dbconfig']) || empty($config['dbconfig'])) {
+            throw new \RuntimeException(
+                'Unable to connect to database, undefined configuration data.'
+            );
+        }
+
+        $type = $config['dbconfig']['db_type'];
+        if (!in_array($type, \PDO::getAvailableDrivers())) {
+            throw new \RuntimeException(
+                sprintf(
+                    "Unable to connect to database, unsupported driver '%s'.",
+                    $type
+                )
+            );
+        }
+
+        $hostname = $config['dbconfig']['db_host_name'];
+        $port = $config['dbconfig']['db_port'];
+        $username = $config['dbconfig']['db_user_name'];
+        $password = $config['dbconfig']['db_password'];
+        $database = $config['dbconfig']['db_name'];
+
+        $dbh = new \PDO(
+            sprintf(
+                '%s:host=%s;port=%s;dbname=%s',
+                $type,
+                $hostname,
+                $port,
+                $database
+            ),
+            $username,
+            $password
+        );
+
+        return $dbh;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function bootApplication()
+    {
+        global $sugar_flavor;
+        global $sugar_version;
+        // global $sugar_build;
+        global $sugar_config;
+        global $locale;
+        global $db;
+        global $beanList;
+        // global $beanFiles;
+        // global $moduleList;
+        // global $modInvisList;
+        // global $adminOnlyList;
+        // global $modules_exempt_from_availability_check;
+
+        chdir($this->getPath());
+
+        require_once 'include/entryPoint.php';
+        require_once 'include/MVC/SugarApplication.php';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function localLogin($username = '')
+    {
+        $factory = \BeanFactory::getBean('Users');
+
+        if (empty($username)) {
+            $user = $factory->getSystemUser();
+
+        } else {
+            $user = $factory->retrieve_by_string_fields(
+                array('user_name' => $username)
+            );
+        }
+
+        if (!empty($user)) {
+            $GLOBALS['current_user'] = $user;
+
+            return $user;
+        }
+
+        if (empty($username)) {
+            throw new \RuntimeException(
+                "Cannot login as administrator. Please check that you have at "
+                . "least one administrator created on your instance."
+            );
+        }
+
+        throw new \RuntimeException(
+            sprintf(
+                "Cannot login as '%s', user not found.",
+                $username
+            )
+        );
     }
 }

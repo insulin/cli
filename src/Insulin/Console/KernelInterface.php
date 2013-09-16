@@ -25,62 +25,53 @@ interface KernelInterface extends \Serializable
 {
 
     /**
-     * Only bootstrap Insulin, without any SugarCRM specific code.
+     * Initializes Insulin, no Sugar specific code is available so far.
      *
-     * Any code that operates on the Insulin installation, and not specifically
-     * any SugarCRM directory, should bootstrap to this phase.
+     * Any code that operates on Insulin and has no dependencies on Sugar
+     * directory/installation should bootstrap to this level.
      */
     const BOOT_INSULIN = 1;
 
     /**
-     * Set up and test for a valid SugarCRM root, either through the -r/--root options,
-     * or evaluated based on the current working directory.
+     * Sets up Sugar root based on the `-p/--path` options, or falls back to the
+     * current working directory if none supplied.
      *
-     * Any code that interacts with an entire SugarCRM installation, and not a specific
-     * site on the SugarCRM installation should use this bootstrap phase.
+     * Any code that interacts with the Sugar directory, should bootstrap to
+     * this level.
      */
     const BOOT_SUGAR_ROOT = 2;
 
     /**
-     * Load the settings from the SugarCRM sites directory.
-     *
-     * This phase is commonly used for code that interacts with the SugarCRM install API,
-     * as both install.php and update.php start at this phase.
+     * Loads Sugar settings from config files.
      */
     const BOOT_SUGAR_CONFIGURATION = 3;
 
     /**
-     * Connect to the SugarCRM database using the database credentials loaded
-     * during the previous bootstrap phase.
+     * Connects to Sugar database using the credentials loaded in the previous
+     * level.
      *
-     * Any code that needs to interact with the SugarCRM database API needs to
-     * be bootstrapped to at least this phase.
+     * Any code that needs to interact with the Sugar database, should
+     * bootstrap to this level.
      */
     const BOOT_SUGAR_DATABASE = 4;
 
     /**
-     * Fully initialize SugarCRM.
-     *
-     * Any code that interacts with the general SugarCRM API should be
-     * bootstrapped to this phase.
+     * This is the first level where Sugar specific code is made available,
+     * which makes this level commonly used by commands that need to interact
+     * with Sugar settings, database and code.
      */
     const BOOT_SUGAR_FULL = 5;
 
     /**
-     * Log in to the initialized SugarCRM site.
+     * Logs in to the Sugar instance with a user supplied by the `-u/--user`
+     * options, or falls back to the system user.
      *
-     * This is the default bootstrap phase all commands will try to reach,
-     * unless otherwise specified.
+     * This level is reached after Sugar has been fully bootstrapped, it's also
+     * the level where all commands will try to reach by default, unless another
+     * level is specified.
      *
-     * This bootstrap phase is used after the site has been
-     * fully bootstrapped.
-     *
-     * This phase will log you in to the SugarCRM site with the username
-     * or user ID specified by the --user/ -u option.
-     *
-     * Use this bootstrap phase for your command if you need to have access
-     * to information for a specific user, such as listing nodes that might
-     * be different based on who is logged in.
+     * Any command that needs access to specific user data should bootstrap to
+     * this level.
      */
     const BOOT_SUGAR_LOGIN = 6;
 

@@ -42,8 +42,19 @@ class BootSubscriber implements EventSubscriberInterface
      */
     public function onKernelBootLevel(KernelBootLevelEvent $event)
     {
-        if ($event->getLevel() === KernelInterface::BOOT_SUGAR_ROOT) {
-            $this->bootSugarRoot($event);
+        static $levels = array(
+            KernelInterface::BOOT_SUGAR_ROOT => 'bootSugarRoot',
+            KernelInterface::BOOT_SUGAR_CONFIGURATION => 'bootSugarConfiguration',
+            KernelInterface::BOOT_SUGAR_DATABASE => 'bootSugarDatabase',
+            KernelInterface::BOOT_SUGAR_FULL => 'bootSugarFull',
+            KernelInterface::BOOT_SUGAR_LOGIN => 'bootSugarLogin',
+        );
+
+        if (isset($levels[$event->getLevel()])) {
+            call_user_func(
+                array($this, $levels[$event->getLevel()]),
+                $event
+            );
         }
     }
 
@@ -66,7 +77,70 @@ class BootSubscriber implements EventSubscriberInterface
             $sugar = $manager->find($kernel->getCwd());
         }
 
-        $sugar->init();
+        $sugar->bootRoot();
         $kernel->getContainer()->set('sugar', $sugar);
+    }
+
+    /**
+     * Boot Sugar configuration.
+     *
+     * @param KernelBootLevelEvent $event
+     *   The event that triggered this boot level process.
+     */
+    protected function bootSugarConfiguration(KernelBootLevelEvent $event)
+    {
+        $event->getKernel()->get('sugar')->bootConfig();
+
+        // FIXME: this needs to be improved
+        $e = new Event();
+        $e->message = '<info>Loaded configurations.</info>';
+        $event->getDispatcher()->dispatch('debug', $e);
+    }
+
+    /**
+     * Boot Sugar database.
+     *
+     * @param KernelBootLevelEvent $event
+     *   The event that triggered this boot level process.
+     *
+     * @throws \RuntimeException
+     *   If database driver found on this SugarCRM instance isn't supported.
+     */
+    protected function bootSugarDatabase(KernelBootLevelEvent $event)
+    {
+        $event->getKernel()->get('sugar')->bootDatabase();
+
+        // FIXME: this needs to be improved
+        $e = new Event();
+        $e->message = '<info>Connected to database.</info>';
+        $event->getDispatcher()->dispatch('debug', $e);
+    }
+
+    /**
+     * Boot Sugar full.
+     *
+     * @param KernelBootLevelEvent $event
+     *   The event that triggered this boot level process.
+     */
+    protected function bootSugarFull(KernelBootLevelEvent $event)
+    {
+        $event->getKernel()->get('sugar')->bootApplication();
+    }
+
+    /**
+     * Boot Sugar login.
+     *
+     * @param KernelBootLevelEvent $event
+     *   The event that triggered this boot level process.
+     *
+     * @throws \RuntimeException
+     *   If there's no user with administrator privileges on this SugarCRM
+     *   instance.
+     */
+    protected function bootSugarLogin(KernelBootLevelEvent $event)
+    {
+        // FIXME: add support for user being supplied by --user|-u global option
+
+        $event->getKernel()->get('sugar')->localLogin();
     }
 }
