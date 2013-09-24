@@ -12,7 +12,9 @@
 
 namespace Insulin\Console;
 
+use Insulin\Sugar\Finder;
 use Insulin\Sugar\Sugar;
+use Insulin\Sugar\SugarManager;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -50,21 +52,21 @@ class BootSubscriber implements EventSubscriberInterface
      *
      * @param KernelBootLevelEvent $event
      *   The event that triggered this boot level process.
-     *
-     * FIXME we need a better factory to search for Sugar instances and to use wrappers based on versions
      */
     protected function bootSugarRoot(KernelBootLevelEvent $event)
     {
         $kernel = $event->getKernel();
-        $sugar = $kernel->get('sugar');
+        /* @var $manager \Insulin\Sugar\Manager */
+        $manager = $kernel->get('sugar_manager');
 
         $path = $kernel->getSugarPath();
         if (!empty($path)) {
-            $sugar->setPath($path);
+            $sugar = $manager->get($path);
         } else {
-            $sugar->setPath($kernel->getCwd(), true);
+            $sugar = $manager->find($kernel->getCwd());
         }
 
         $sugar->init();
+        $kernel->getContainer()->set('sugar', $sugar);
     }
 }

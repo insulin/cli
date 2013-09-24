@@ -13,11 +13,10 @@
 namespace Insulin\Sugar\Exception;
 
 /**
- * Thrown when a specific path does not contain a valid SugarCRM instance root
- * directory.
+ * Thrown when an error occurs in Sugar.
  *
  * @api
  */
-class RootNotFoundException extends Exception
+class Exception extends \Exception
 {
 }

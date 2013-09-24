@@ -12,25 +12,36 @@
 
 namespace Insulin\Sugar;
 
-use Insulin\Sugar\Exception\RootNotFoundException;
-use Symfony\Component\Finder\Finder;
-
 /**
  * Abstraction to handle a SugarCRM instance.
  *
  * This class abstracts the way how one can interact with a SugarCRM instance
- * regardless of it's version.
+ * regardless of it's version. Use classes provided on the `Versions/` folder
+ * to provide special cases functionality.
+ *
+ * @see SugarManager::get()
  */
-class Sugar implements SugarInterface
+abstract class Sugar implements SugarInterface
 {
-    /**
-     * The path for the SugarCRM instance.
-     *
-     * @var string
-     *
-     * @see Sugar::setPath() where this path is set.
-     */
     protected $path;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * Initializes this Sugar instance to be ready to call Sugar code.
+     */
+    public function init()
+    {
+        if (!defined('sugarEntry')) {
+            define('sugarEntry', true);
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -38,152 +49,6 @@ class Sugar implements SugarInterface
     public function getPath()
     {
         return $this->path;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPath($path, $lookup = false)
-    {
-        if (!$lookup && !$this->isRoot($path)) {
-            throw new RootNotFoundException(
-                sprintf(
-                    "SugarCRM instance root directory not found in path '%s'.",
-                    $path
-                )
-            );
-        }
-
-        if ($lookup) {
-            $path = $this->lookupPath($path);
-        }
-
-        $this->path = $path;
-        return $this;
-    }
-
-    /**
-     * Checks if supplied path matches a valid SugarCRM instance root directory.
-     *
-     * @param string $path
-     *   Path to a SugarCRM instance root.
-     *
-     * @return bool
-     *   True if supplied path is a valid SugarCRM instance root directory,
-     *   false otherwise.
-     *
-     * @throws \InvalidArgumentException
-     *   If supplied path does not match a valid SugarCRM instance root
-     *   directory.
-     */
-    protected function isRoot($path)
-    {
-        if (!is_dir($path)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Invalid path given: '%s'.",
-                    $path
-                )
-            );
-        }
-
-        static $candidates = array(
-            'include/entryPoint.php',
-            'include/MVC/SugarApplication.php',
-            'sugar_version.php'
-        );
-
-        foreach ($candidates as $candidate) {
-            if (!is_file($path . '/' . $candidate)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Search for SugarCRM instance root directory inside supplied path.
-     *
-     * @param string $path
-     *   Search for a SugarCRM instance root inside supplied path.
-     * @param bool $followLinks
-     *   (optional) True forces symlinks to be followed, defaults to false.
-     *
-     * @return string
-     *   Path to the SugarCRM instance root directory.
-     *
-     * @throws \InvalidArgumentException
-     *   If supplied path is invalid.
-     * @throws \Insulin\Sugar\Exception\RootNotFoundException
-     *   If supplied path does not contain a valid SugarCRM instance root
-     *   directory.
-     */
-    protected function find($path, $followLinks = false)
-    {
-        if (!is_dir($path)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Invalid path given: "%s".',
-                    $path
-                )
-            );
-        }
-
-        $tmpPath = $path;
-
-        while ($tmpPath) {
-            $finder = new Finder();
-
-            if ($followLinks && is_link($tmpPath)) {
-                $tmpPath = realpath($tmpPath);
-            }
-
-            $finder->files()->name('sugar_version.php')->depth(0)->in($tmpPath);
-
-            if (1 === $finder->count() && $this->isRoot($tmpPath)) {
-                return $tmpPath;
-            }
-
-            $tmpPath = $this->shiftPathUp($tmpPath);
-        }
-
-        throw new RootNotFoundException(
-            sprintf(
-                "SugarCRM instance root directory not found in path '%s'.",
-                $path
-            )
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function lookupPath($path)
-    {
-        try {
-            return $this->find($path);
-
-        } catch (RootNotFoundException $e) {
-            return $this->find($path, true);
-        }
-    }
-
-    /**
-     * Retrieves supplied path upper directory.
-     *
-     * @param string $path
-     *   Path to directory.
-     *
-     * @return string
-     *   Returns the upper directory path based on supplied path, or an empty
-     *   string if none is found.
-     */
-    private function shiftPathUp($path)
-    {
-        $path = explode('/', $path);
-        array_pop($path);
-        return implode('/', $path);
     }
 
     /**
@@ -199,7 +64,7 @@ class Sugar implements SugarInterface
      *
      * @throws \InvalidArgumentException
      *   If unknown property supplied.
-     * @throws \RuntimeException
+     * @throws Exception\RuntimeException
      *   If the supplied property isn't found on this SugarCRM instance.
      */
     public function getInfo($property = 'version', $refresh = false)
@@ -228,7 +93,7 @@ class Sugar implements SugarInterface
         }
 
         if (false === $info[$property]) {
-            throw new \RuntimeException(
+            throw new Exception\RuntimeException(
                 sprintf(
                     "Unsupported property '%s' in current SugarCRM instance '%s'.",
                     $property,
@@ -238,15 +103,5 @@ class Sugar implements SugarInterface
         }
 
         return $info[$property];
-    }
-
-    /**
-     * FIXME this will need to be moved to a SugarWrapper that isn't PSR-2 valid
-     */
-    public function init()
-    {
-        if (!defined('sugarEntry')) {
-            define('sugarEntry', true);
-        }
     }
 }
