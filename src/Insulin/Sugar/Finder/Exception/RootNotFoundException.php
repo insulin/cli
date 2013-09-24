@@ -10,13 +10,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Insulin\Sugar\Exception;
+namespace Insulin\Sugar\Finder\Exception;
 
 /**
- * Thrown when an error occurs in Sugar.
+ * Thrown when Finder was unable to find a valid SugarCRM instance root.
  *
  * @api
  */
-class SugarException extends \Exception
+class RootNotFoundException extends Exception
 {
 }

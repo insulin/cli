@@ -14,18 +14,8 @@ namespace Insulin\Sugar\Tests;
 
 use Insulin\Sugar\Manager;
 
-abstract class SugarTest extends \PHPUnit_Framework_TestCase
+class ManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * Version in format X.Y.Z (e.g.: 7.0.0).
-     *
-     * Set this one for the versions that need to be tested when extending your
-     * Test.
-     *
-     * @var string $version
-     */
-    protected static $version;
-
     protected static $root;
     protected static $files;
 
@@ -73,66 +63,75 @@ abstract class SugarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerGetInfo
+     * Tests availability of Sugar proxies supported on Insulin.
+     *
+     * @param string $version
+     *   The version to test.
+     * @param bool $isSupported
+     *   True if this version should be supported, false otherwise.
+     *
+     * @dataProvider supportedVersions
      */
-    public function testGetInfo($property, $expectedValue, $expectedException = null)
+    public function testGet($version, $isSupported)
     {
         file_put_contents(
             static::$root . '/sugar/sugar_version.php',
             '<?php
-$sugar_version      = \'6.5.3\';
-$sugar_db_version   = \'6.5.3\';
+$sugar_version      = \'' . $version . '\';
+$sugar_db_version   = \'' . $version . '\';
 $sugar_flavor       = \'ENT\';
 $sugar_build        = \'123\';
 $sugar_timestamp    = \'2008-08-01 12:00am\';
 '
         );
 
-        if (!empty($expectedException)) {
-            $this->setExpectedException($expectedException);
+        if (!$isSupported) {
+            $this->setExpectedException(
+                '\Insulin\Sugar\Exception\RuntimeException',
+                sprintf("Unsupported version: '%s'.", $version)
+            );
         }
 
         $manager = new Manager();
 
-        /* @var $sugar \Insulin\Sugar\SugarInterface */
         $sugar = $manager->get(static::$root . '/sugar');
-
-        $this->assertInstanceOf('\Insulin\Sugar\Sugar', $sugar);
-        $this->assertEquals($expectedValue, $sugar->getInfo($property));
+        $this->assertInstanceOf('Insulin\Sugar\SugarInterface', $sugar);
     }
 
-    public function providerGetInfo()
+    public function supportedVersions()
     {
         return array(
-            array('flavor', 'ENT'),
-            array('version', '6.5.3'),
-            array('build', '123'),
-            array('unknownProperty', null, 'InvalidArgumentException'),
+            array('7.0.0', true),
+            array('6.5.0', true),
+            array('6.4.0', false),
+            array('6.0.0', false),
         );
     }
 
-    public function testGetInfoUnsupportedProperty()
+    /**
+     * @expectedException \Insulin\Sugar\Exception\RootNotFoundException
+     */
+    public function testGetRootNotFound()
     {
-        $this->setExpectedException(
-            '\Insulin\Sugar\Exception\RuntimeException',
-            sprintf(
-                "Unsupported property '%s' in current SugarCRM instance '%s'.",
-                'flavor',
-                static::$root . '/sugar'
-            )
-        );
+        $manager = new Manager();
+        $manager->get(static::$root . '/sugar/include');
+    }
 
+    public function testFind()
+    {
         file_put_contents(
-            self::$root . '/sugar/sugar_version.php',
+            static::$root . '/sugar/sugar_version.php',
             '<?php
-$sugar_version      = \'6.5.3\';
+$sugar_version      = \'7.0.0\';
+$sugar_db_version   = \'\';
+$sugar_flavor       = \'ENT\';
+$sugar_build        = \'123\';
+$sugar_timestamp    = \'2013-08-08 12:00am\';
 '
         );
 
         $manager = new Manager();
-        $sugar = $manager->get(static::$root . '/sugar');
-
-        /* @var $sugar Finder */
-        $sugar->getInfo('flavor', true);
+        $sugar = $manager->find(static::$root . '/sugar/include');
+        $this->assertInstanceOf('Insulin\Sugar\SugarInterface', $sugar);
     }
 }

@@ -23,6 +23,24 @@ namespace Insulin\Sugar;
  */
 interface SugarInterface
 {
+
+    /**
+     * Creates a new Sugar instance proxy to wrap all Sugar element elegantly.
+     *
+     * @param string $path
+     *   The real path to this Sugar instance.
+     *
+     * @api
+     */
+    public function __construct($path);
+
+    /**
+     * Initializes a Sugar Instance to be ready for invokes.
+     *
+     * @api
+     */
+    public function init();
+
     /**
      * Retrieves current SugarCRM instance root directory.
      *
@@ -32,45 +50,4 @@ interface SugarInterface
      * @api
      */
     public function getPath();
-
-    /**
-     * Sets the path for the current SugarCRM instance.
-     *
-     * @param string $path
-     *   Path to a SugarCRM instance.
-     * @param bool $lookup
-     *   (optional) True forces lookup for a SugarCRM instance root directory on supplied
-     *   path, defaults to false.
-     *
-     * @return Sugar
-     *   Current Sugar instance.
-     *
-     * @throws \InvalidArgumentException
-     *   If supplied path is invalid.
-     * @throws \Insulin\Sugar\Exception\RootNotFoundException
-     *   If supplied path does not contain a valid SugarCRM instance root
-     *   directory.
-     *
-     * @api
-     */
-    public function setPath($path, $lookup);
-
-    /**
-     * Lookup SugarCRM instance root directory inside supplied path.
-     *
-     * @param string $path
-     *   Lookup path to a SugarCRM instance.
-     *
-     * @return string
-     *   Returns SugarCRM instance root.
-     *
-     * @throws \InvalidArgumentException
-     *   If supplied path is invalid.
-     * @throws \Insulin\Sugar\Exception\RootNotFoundException
-     *   If supplied path does not contain a valid SugarCRM instance root
-     *   directory.
-     *
-     * @api
-     */
-    public function lookupPath($path);
 }
