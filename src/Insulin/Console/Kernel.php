@@ -112,7 +112,7 @@ class Kernel extends ContainerAware implements KernelInterface
 
         if ($this->debug) {
             ini_set('display_errors', 1);
-            error_reporting(-1);
+            error_reporting(E_ALL & ~E_STRICT);
         } else {
             ini_set('display_errors', 0);
         }

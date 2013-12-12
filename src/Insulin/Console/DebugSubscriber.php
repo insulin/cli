@@ -24,7 +24,19 @@ class DebugSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array();
+        return array(
+            KernelEvents::BOOT_LEVEL_BEFORE => array(
+                array('onKernelBootLevelBefore'),
+            ),
+            KernelEvents::BOOT_LEVEL_SUCCESS => array(
+                array('onKernelBootLevelSuccess'),
+            ),
+            KernelEvents::BOOT_LEVEL_FAILURE => array(
+                array('onKernelBootLevelFailure'),
+            ),
+            // FIXME: this needs to be improved
+            'debug' => array('debug'),
+        );
     }
 
     /**
@@ -37,5 +49,62 @@ class DebugSubscriber implements EventSubscriberInterface
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
+    }
+
+    /**
+     * Listen for Kernel boot success levels.
+     *
+     * @param KernelBootLevelEvent $event
+     *   The event that contains the level that we're trying to boot to.
+     */
+    public function onKernelBootLevelBefore(KernelBootLevelEvent $event)
+    {
+        $this->output->writeln(
+            sprintf("<info>Attempting to reach level '%d'.</info>", $event->getLevel())
+        );
+    }
+
+    /**
+     * Listen for Kernel boot success levels.
+     *
+     * @param KernelBootLevelEvent $event
+     *   The event that contains the level that was booted successfully.
+     */
+    public function onKernelBootLevelSuccess(KernelBootLevelEvent $event)
+    {
+        if ($event->getLevel() === Kernel::BOOT_SUGAR_LOGIN) {
+            $this->output->writeln(
+                sprintf("<info>Logged in as '%s'.</info>", $GLOBALS['current_user']->user_name)
+            );
+        }
+
+        $this->output->writeln(
+            sprintf("<info>Reached level '%d'.</info>", $event->getLevel())
+        );
+    }
+
+    /**
+     * Listen for possible Kernel boot failures.
+     *
+     * @param KernelBootEvent $event
+     *   The event that contains the boot failure.
+     */
+    public function onKernelBootLevelFailure(KernelBootLevelEvent $event)
+    {
+        $this->output->writeln(
+            sprintf(
+                "<error>Unable to reach level '%d' due to: %s</error>",
+                $event->getLevel(),
+                $event->getException()->getMessage()
+            )
+        );
+    }
+
+    /**
+     * FIXME: this needs to be improved
+     */
+    public function debug($event)
+    {
+        $this->output->writeln($event->message);
     }
 }

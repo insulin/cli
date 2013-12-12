@@ -50,16 +50,16 @@ class VerboseSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Listen for Kernel boot success levels.
+     * Listen for Kernel last successful reached level.
      *
      * @param KernelBootEvent $event
-     *   The event that contains the level that was booted successfully.
+     *   The event that contains the last successful reached level.
      */
     public function onKernelBootSuccess(KernelBootEvent $event)
     {
         $this->output->writeln(
             sprintf(
-                "Boot level '%d' reached.",
+                "<info>Successfully reached level '%d'.</info>",
                 $event->getKernel()->getBootedLevel()
             )
         );
