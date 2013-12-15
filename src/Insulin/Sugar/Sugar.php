@@ -175,7 +175,7 @@ abstract class Sugar implements SugarInterface
         global $locale;
         global $db;
         global $beanList;
-        // global $beanFiles;
+        global $beanFiles;
         // global $moduleList;
         // global $modInvisList;
         // global $adminOnlyList;
