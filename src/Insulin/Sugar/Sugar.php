@@ -223,4 +223,14 @@ abstract class Sugar implements SugarInterface
             )
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSystemSettings($category, $reload = false)
+    {
+        $admin = \BeanFactory::getBean('Administration');
+        $admin->retrieveSettings($category, $reload);
+        return $admin->settings;
+    }
 }

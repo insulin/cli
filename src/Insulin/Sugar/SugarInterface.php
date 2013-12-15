@@ -115,5 +115,20 @@ interface SugarInterface
      * @throws \RuntimeException
      *   If login fails.
      */
-    public function localLogin();
+    public function localLogin($username);
+
+    /**
+     * Gets the system settings from the Administration module.
+     *
+     * @param string $category
+     *   The category to get a slimmer payload.
+     * @param bool $reload
+     *   Reload data by skipping cache.
+     * @return array
+     *   All the settings cached due to bug on SugarCRM.
+     *
+     * TODO we should only get the category(ies) that we asked for.
+     * Currently we send information just like SugarCRM has it.
+     */
+    public function getSystemSettings($category, $reload = false);
 }
