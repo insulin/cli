@@ -112,10 +112,12 @@ class Kernel extends ContainerAware implements KernelInterface
 
         if ($this->debug) {
             ini_set('display_errors', 1);
-            error_reporting(E_ALL & ~E_STRICT);
+            error_reporting(-1);
         } else {
             ini_set('display_errors', 0);
         }
+
+        set_error_handler(array($this, 'errorHandler'));
     }
 
     /**
@@ -741,5 +743,49 @@ class Kernel extends ContainerAware implements KernelInterface
     public function get($id)
     {
         return $this->container->get($id);
+    }
+
+    /**
+     * This is the handler for set_error_handler setup on Kernel.
+     *
+     * SugarCRM isn't E_STRICT valid, but our code tries to be at it's best.
+     * Therefore, we set this error handler so we can check if it was fired
+     * from SugarCRM bootstrap or from Insulin's code (including commands).
+     *
+     * These following params and descriptions are from php.net.
+     *
+     * @param int $errno
+     *   The first parameter, errno, contains the level of the error raised, as
+     *   an integer.
+     * @param string $errstr
+     *   The second parameter, errstr, contains the error message, as a string.
+     * @param string $errfile
+     *   The third parameter is optional, errfile, which contains the filename
+     *   that the error was raised in, as a string.
+     * @param int $errline
+     *   The fourth parameter is optional, errline, which contains the line
+     *   number the error was raised at, as an integer.
+     * @param array $errcontext
+     *   The fifth parameter is optional, errcontext, which is an array that
+     *   points to the active symbol table at the point the error occurred.
+     *   In other words, errcontext will contain an array of every variable
+     *   that existed in the scope the error was triggered in. User error
+     *   handler must not modify error context.
+     *
+     * @return boolean
+     *   If the function returns FALSE then the normal error handler continues.
+     *
+     * @see http://www.php.net/manual/en/function.set-error-handler.php
+     */
+    public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+    {
+        if (!$this->container || !$this->container->has('sugar')) {
+            return false;
+        }
+
+        /* @var $sugar \Insulin\Sugar\SugarInterface */
+        $sugar = $this->container->get('sugar');
+
+        return strpos($errfile, $sugar->getPath()) !== false;
     }
 }
