@@ -13,9 +13,7 @@
 namespace Insulin\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -52,7 +50,6 @@ EOF
     {
         /* @var $kernel \Insulin\Console\KernelInterface */
         $kernel = $this->getApplication()->getKernel();
-        $kernel->boot();
 
         if ($kernel->getBootedLevel() < $kernel::BOOT_SUGAR_ROOT) {
             // FIXME change this to a common exception to be used by all commands
@@ -64,16 +61,6 @@ EOF
         $flavor = $sugar->getInfo('flavor');
         $version = $sugar->getInfo('version');
         $build = $sugar->getInfo('build');
-
-        /*
-        if ($input->getOption('pipe')) {
-            $output->writeln(
-                '"' . implode('","', array($flavor, $version, $build)) . '"'
-            );
-
-            return;
-        }
-        */
 
         $text = sprintf(
             "SugarCRM %s %s build %s",
