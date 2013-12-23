@@ -84,10 +84,17 @@ abstract class Sugar implements SugarInterface
 
     /**
      * {@inheritdoc}
+     *
+     * Defines `sugarEntry` constant in order to be able to include main code,
+     * plus adds this SugarCRM instance root directory to include path.
      */
     public function bootRoot()
     {
         defined('sugarEntry') || define('sugarEntry', true);
+
+        set_include_path(
+            get_include_path() . PATH_SEPARATOR . $this->getPath()
+        );
     }
 
     /**
@@ -101,7 +108,7 @@ abstract class Sugar implements SugarInterface
             return $config;
         }
 
-        $configFile = $this->getPath() . '/config.php';
+        $configFile = 'config.php';
         if (!is_file($configFile)) {
             throw new \RuntimeException('Cannot boot configuration: config.php not found.');
         }
@@ -109,7 +116,7 @@ abstract class Sugar implements SugarInterface
         global $sugar_config;
         include $configFile;
 
-        $override = $this->getPath() . '/config_override.php';
+        $override = 'config_override.php';
         if (is_file($override)) {
             include $override;
         }
@@ -180,8 +187,6 @@ abstract class Sugar implements SugarInterface
         // global $modInvisList;
         // global $adminOnlyList;
         // global $modules_exempt_from_availability_check;
-
-        chdir($this->getPath());
 
         require_once 'include/entryPoint.php';
         require_once 'include/MVC/SugarApplication.php';
