@@ -87,11 +87,11 @@ interface SugarInterface
     /**
      * Boots database.
      *
-     * @return PDO
-     *   Database handler.
+     * @return \Doctrine\DBAL\Connection
+     *   Wrapper class.
      *
      * @throws \RuntimeException
-     *   If database config is invalid or an unsupported driver is supplied.
+     *   If database configuration data is undefined.
      */
     public function bootDatabase();
 

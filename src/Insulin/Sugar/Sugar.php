@@ -12,6 +12,8 @@
 
 namespace Insulin\Sugar;
 
+use Doctrine\DBAL\DriverManager;
+
 /**
  * Abstraction to handle a SugarCRM instance.
  *
@@ -92,9 +94,7 @@ abstract class Sugar implements SugarInterface
     {
         defined('sugarEntry') || define('sugarEntry', true);
 
-        set_include_path(
-            get_include_path() . PATH_SEPARATOR . $this->getPath()
-        );
+        chdir($this->getPath());
     }
 
     /**
@@ -133,41 +133,37 @@ abstract class Sugar implements SugarInterface
     {
         $config = $this->bootConfig();
 
-        if (!isset($config['dbconfig']) || empty($config['dbconfig'])) {
+        if (empty($config['dbconfig'])) {
             throw new \RuntimeException(
-                'Unable to connect to database, undefined configuration data.'
+                'Unable to boot database, undefined configuration data.'
             );
         }
 
-        $type = $config['dbconfig']['db_type'];
-        if (!in_array($type, \PDO::getAvailableDrivers())) {
-            throw new \RuntimeException(
-                sprintf(
-                    "Unable to connect to database, unsupported driver '%s'.",
-                    $type
-                )
-            );
+        // FIXME: need to translate sugar db types to doctrine db types
+        // we're currently only supporting mysql
+        if ($config['dbconfig']['db_type'] === 'mysql') {
+            $config['dbconfig']['db_type'] = 'pdo_mysql';
         }
 
-        $hostname = $config['dbconfig']['db_host_name'];
-        $port = $config['dbconfig']['db_port'];
-        $username = $config['dbconfig']['db_user_name'];
-        $password = $config['dbconfig']['db_password'];
-        $database = $config['dbconfig']['db_name'];
-
-        $dbh = new \PDO(
-            sprintf(
-                '%s:host=%s;port=%s;dbname=%s',
-                $type,
-                $hostname,
-                $port,
-                $database
-            ),
-            $username,
-            $password
+        $params = array(
+            'dbname' => $config['dbconfig']['db_name'],
+            'driver' => $config['dbconfig']['db_type'],
+            'host' => $config['dbconfig']['db_host_name'],
+            'password' => $config['dbconfig']['db_password'],
+            'port' => $config['dbconfig']['db_port'],
+            'user' => $config['dbconfig']['db_user_name'],
         );
 
-        return $dbh;
+        $wrapper = $this->getDatabaseWrapper();
+        if (!empty($wrapper)) {
+            $params['wrapperClass'] = $wrapper;
+        }
+
+        $connection = DriverManager::getConnection($params);
+        $connection->connect();
+        $connection->close();
+
+        return $connection;
     }
 
     /**
@@ -197,20 +193,19 @@ abstract class Sugar implements SugarInterface
      */
     public function localLogin($username = '')
     {
-        $factory = \BeanFactory::getBean('Users');
+        $manager = $this->getBean('Users');
 
         if (empty($username)) {
-            $user = $factory->getSystemUser();
+            $user = $manager->getSystemUser();
 
         } else {
-            $user = $factory->retrieve_by_string_fields(
+            $user = $manager->retrieve_by_string_fields(
                 array('user_name' => $username)
             );
         }
 
         if (!empty($user)) {
             $GLOBALS['current_user'] = $user;
-
             return $user;
         }
 
@@ -222,10 +217,41 @@ abstract class Sugar implements SugarInterface
         }
 
         throw new \RuntimeException(
-            sprintf(
-                "Cannot login as '%s', user not found.",
-                $username
-            )
+            sprintf("Cannot login as '%s', user not found.", $username)
         );
+    }
+
+    /**
+     * Retrieves database wrapper.
+     *
+     * @return \Doctrine\DBAL\Connection|null
+     *   Wrapper class or `null` if none.
+     */
+    protected function getDatabaseWrapper()
+    {
+        return null;
+    }
+
+    /**
+     * Retrieves bean based on supplied module name.
+     *
+     * @param string $module
+     *   Module name.
+     *
+     * @return \SugarBean
+     *   Bean instance.
+     *
+     * @throws \RuntimeException
+     *   If no matching bean for supplied module name.
+     */
+    protected function getBean($module)
+    {
+        $bean = \BeanFactory::getBean($module);
+
+        if (empty($bean)) {
+            throw new \RuntimeException(
+              sprintf("Unable to retrieve bean for '%s' module.", $module)
+            );
+        }
     }
 }
