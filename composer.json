@@ -24,9 +24,9 @@
         }
     ],
     "autoload": {
-        "psr-0": {
-            "Insulin": "src/",
-            "Sugar": "src/"
+        "psr-4": {
+            "Insulin\\Console\\": "src/Console/",
+            "Insulin\\Sugar\\": "src/Sugar/"
         }
     },
     "require": {

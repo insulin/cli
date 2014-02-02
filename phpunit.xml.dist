@@ -2,21 +2,21 @@
 
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit
-        backupGlobals               = "false"
-        backupStaticAttributes      = "false"
-        colors                      = "true"
-        convertErrorsToExceptions   = "true"
-        convertNoticesToExceptions  = "true"
-        convertWarningsToExceptions = "true"
-        processIsolation            = "false"
-        stopOnFailure               = "false"
-        strict                      = "true"
-        syntaxCheck                 = "false"
-        bootstrap                   = "autoload.php">
+        backupGlobals="false"
+        backupStaticAttributes="false"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        processIsolation="false"
+        stopOnFailure="false"
+        strict="true"
+        syntaxCheck="false"
+        bootstrap="autoload.php">
 
     <testsuites>
         <testsuite name="Insulin Test Suite">
-            <directory>src/*/*/Tests</directory>
+            <directory>src/*/Tests</directory>
         </testsuite>
     </testsuites>
 
@@ -24,8 +24,8 @@
         <whitelist>
             <directory>src</directory>
             <exclude>
-                <directory>src/*/*/Resources</directory>
-                <directory>src/*/*/Tests</directory>
+                <directory>src/*/Resources</directory>
+                <directory>src/*/Tests</directory>
             </exclude>
         </whitelist>
     </filter>
