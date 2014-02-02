@@ -250,8 +250,10 @@ abstract class Sugar implements SugarInterface
 
         if (empty($bean)) {
             throw new \RuntimeException(
-              sprintf("Unable to retrieve bean for '%s' module.", $module)
+                sprintf("Unable to retrieve bean for '%s' module.", $module)
             );
         }
+
+        return $bean;
     }
 }
