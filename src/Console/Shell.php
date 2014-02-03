@@ -18,6 +18,8 @@ use Symfony\Component\Console\Shell as BaseShell;
  * An Insulin Shell wraps an Application to add shell capabilities to it.
  *
  * This extends from Symfony's Shell default abilities.
+ *
+ * @codeCoverageIgnore because we are only applying the logo in the header.
  */
 class Shell extends BaseShell
 {

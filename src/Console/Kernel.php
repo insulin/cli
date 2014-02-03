@@ -326,17 +326,6 @@ class Kernel extends ContainerAware implements KernelInterface
     }
 
     /**
-     * Used internally.
-     */
-    public function setClassCache(array $classes)
-    {
-        file_put_contents(
-            $this->getCacheDir() . '/classes.map',
-            sprintf('<?php return %s;', var_export($classes, true))
-        );
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getStartTime()
@@ -469,12 +458,8 @@ class Kernel extends ContainerAware implements KernelInterface
         $fresh = true;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
-            $this->dumpContainer(
-                $cache,
-                $container,
-                $class,
-                $this->getContainerBaseClass()
-            );
+            $container->compile();
+            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
         }
@@ -575,7 +560,6 @@ class Kernel extends ContainerAware implements KernelInterface
         $container = $this->getContainerBuilder();
 
         $container->addObjectResource($this);
-        $container->compile();
 
         return $container;
     }
@@ -632,26 +616,36 @@ class Kernel extends ContainerAware implements KernelInterface
      * @return string
      *   The PHP string with the comments removed.
      */
-    protected static function stripComments($source)
+    public static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;
         }
 
+        $rawChunk = '';
         $output = '';
-        foreach (token_get_all($source) as $token) {
+        $tokens = token_get_all($source);
+        for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
             if (is_string($token)) {
-                $output .= $token;
+                $rawChunk .= $token;
+            } elseif (T_START_HEREDOC === $token[0]) {
+                $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk).$token[1];
+                do {
+                    $token = next($tokens);
+                    $output .= $token[1];
+                } while ($token[0] !== T_END_HEREDOC);
+                $rawChunk = '';
             } elseif (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
-                $output .= $token[1];
+                $rawChunk .= $token[1];
             }
         }
 
         // replace multiple new lines with a single newline
-        $output = preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $output);
+        $output .= preg_replace(array('/\s+$/Sm', '/\n+/S'), "\n", $rawChunk);
 
         return $output;
     }
+
 
     /**
      * Provide a way to serialize a kernel. Currently save the debug status.

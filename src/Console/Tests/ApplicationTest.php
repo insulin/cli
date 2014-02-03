@@ -53,19 +53,46 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Confirm that all the core commands with bootstrap level
+     * `BOOT_SUGAR_ROOT` will be available by default.
+     */
+    public function testDebugOutput()
+    {
+        $kernel = $this->getKernel(Kernel::BOOT_INSULIN, null, true);
+
+        $insulin = new Application($kernel);
+        $insulin->setAutoExit(false);
+
+        $insulinTester = new ApplicationTester($insulin);
+        $insulinTester->run(array('command' => 'list'));
+
+        $this->assertRegExp('/Memory usage: (.*)MB \(peak: (.*)MB\), time: (.*)s/', $insulinTester->getDisplay());
+    }
+
+    /**
      * Gets a mock kernel to test the Insulin Application.
      *
-     * @param $level
+     * @param integer $level
      *   The level of the boot reached.
+     * @param array $methods
+     *   Additional methods to mock (besides the required to boot to the given
+     *   level).
+     * @param boolean $debug
+     *   Set it to `true` to run the Kernel in debug mode.
      *
      * @return \Insulin\Console\KernelInterface
      */
-    private function getKernel($level)
+    private function getKernel($level, $methods = array(), $debug = false)
     {
-        $kernel = $this->getMock(
-            'Insulin\Console\Kernel',
-            array('getBootedLevel', 'getRootDir')
-        );
+        $mockMethods = array('getBootedLevel', 'getRootDir');
+        if (!empty($methods)) {
+            $mockMethods = array_merge($mockMethods, $methods);
+        }
+        $kernel = $this->getMockBuilder('Insulin\Console\Kernel')
+            ->setMethods($mockMethods)
+            ->setConstructorArgs(array($debug))
+            ->getMock();
+
         $kernel->expects($this->any())->method('getBootedLevel')->will(
             $this->returnValue($level)
         );
