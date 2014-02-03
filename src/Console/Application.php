@@ -118,11 +118,13 @@ EOF;
         $this->registerCommands();
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
+            // @codeCoverageIgnoreStart
             $shell = new Shell($this);
             $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));
             $shell->run();
 
             return 0;
+            // @codeCoverageIgnoreEnd
         }
 
         $result = parent::doRun($input, $output);
@@ -191,15 +193,6 @@ EOF;
         }
 
         $searchPath = array_filter($searchPath, 'is_dir');
-
-        if (empty($searchPath)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'No search path for commands available for run level "%s".',
-                    $this->kernel->getBootedLevel()
-                )
-            );
-        }
 
         $finder = new Finder();
         $finder->files()->name('*Command.php')->in($searchPath);

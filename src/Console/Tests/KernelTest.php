@@ -77,7 +77,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             array('getBootstrapLevels', 'bootTo')
         );
         $kernel->expects($this->once())->method('getBootstrapLevels')->will(
-            $this->returnValue(array('1'))
+            $this->returnValue(array(1))
         );
 
         /* @var $kernel \Insulin\Console\KernelInterface */
@@ -93,10 +93,10 @@ class KernelTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootFailure()
     {
-        $kernel = $this->getMock(
-            'Insulin\Console\Kernel',
-            array('getBootstrapLevels', 'bootTo')
-        );
+        $kernel = $this->getMockBuilder('Insulin\Console\Kernel')
+            ->setMethods(array('getBootstrapLevels', 'bootTo'))
+            ->setConstructorArgs(array(true))
+            ->getMock();
 
         $kernel->expects($this->once())->method('getBootstrapLevels')->will(
             $this->returnValue(array(1))
@@ -125,4 +125,126 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->shutdown();
         $this->assertNull($kernel->getContainer());
     }
+
+    /**
+     * Confirm that we can't shutdown the Kernel if there is no valid boot.
+     */
+    public function testShutdownsWhenNotBooted()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('isBooted')
+        );
+        $kernel->expects($this->once())->method('isBooted')->will(
+            $this->returnValue(false)
+        );
+
+        /* @var $kernel \Insulin\Console\Kernel */
+        $kernel->shutdown();
+    }
+
+    /**
+     * Confirm that we can get the booted level if kernel is booted.
+     */
+    public function testGetBootedLevel()
+    {
+        $kernel = $this->getMock(
+            'Insulin\Console\Kernel',
+            array('getBootstrapLevels', 'bootTo')
+        );
+
+        $kernel->expects($this->once())->method('getBootstrapLevels')->will(
+            $this->returnValue(array(1, 2))
+        );
+
+        $kernel->boot();
+        $this->assertEquals(2, $kernel->getBootedLevel());
+
+    }
+
+    /**
+     * Confirm that the comments are stripped from PHP files correctly.
+     */
+    public function testStripComments()
+    {
+        if (!function_exists('token_get_all')) {
+            $this->markTestSkipped('The function token_get_all() is not available.');
+
+            return;
+        }
+        $source = <<<'EOF'
+<?php
+
+$string = 'string should not be   modified';
+
+
+$heredoc = <<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+
+$nowdoc = <<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
+
+/**
+ * some class comments to strip
+ */
+class TestClass
+{
+    /**
+     * some method comments to strip
+     */
+    public function doStuff()
+    {
+        // inline comment
+    }
+}
+EOF;
+        $expected = <<<'EOF'
+<?php
+$string = 'string should not be   modified';
+$heredoc =
+<<<HD
+
+
+Heredoc should not be   modified
+
+
+HD;
+$nowdoc =
+<<<'ND'
+
+
+Nowdoc should not be   modified
+
+
+ND;
+class TestClass
+{
+    public function doStuff()
+    {
+            }
+}
+EOF;
+
+        $output = Kernel::stripComments($source);
+
+        // Heredocs are preserved, making the output mixing unix and windows line
+        // endings, switching to "\n" everywhere on windows to avoid failure.
+        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+            $expected = str_replace("\r\n", "\n", $expected);
+            $output = str_replace("\r\n", "\n", $output);
+        }
+
+        $this->assertEquals($expected, $output);
+    }
+
 }
