@@ -7,6 +7,7 @@ Welcome to Insulin…
 [![Latest Unstable Version](https://poser.pugx.org/insulin/cli/v/unstable.png)](https://packagist.org/packages/insulin/cli)
 [![Coverage Status](https://coveralls.io/repos/insulin/cli/badge.png)](https://coveralls.io/r/insulin/cli)
 [![Build Status](https://secure.travis-ci.org/insulin/cli.png?branch=master)](http://travis-ci.org/insulin/cli)
+[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/insulin/cli/badges/quality-score.png?s=7c573ec6222a07c46425b5fe68058c02d0a071a0)](https://scrutinizer-ci.com/g/insulin/cli/)
 
 1) Developing on insulin
 ------------------------
