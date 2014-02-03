@@ -1,7 +1,5 @@
 # Insulin documentation
-docs
+/docs
 
-# Symfony
-build/
-vendor
-bin
+# Third party tools
+/vendor
