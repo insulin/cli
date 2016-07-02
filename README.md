@@ -1,6 +1,8 @@
 Insulin
 =======
 
+## This project is now abandoned, since there is a new command line interface shipping with SugarCRM.
+
 Welcome to Insulin…
 [![Latest Stable Version](https://poser.pugx.org/insulin/cli/v/stable.png)](https://packagist.org/packages/insulin/cli)
 [![Total Downloads](https://poser.pugx.org/insulin/cli/downloads.png)](https://packagist.org/packages/insulin/cli)
